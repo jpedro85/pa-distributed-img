@@ -1,3 +1,7 @@
+package Network.Client;
+import Network.Server.Request;
+import Network.Server.Response;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -43,7 +47,7 @@ public class Client {
             out.writeObject ( request );
 
             // Wait for and return the response from the server
-            Response response = ( Response ) in.readObject ( );
+            Response response = (Response) in.readObject ( );
             System.out.println ( "Received: " + response );
             return response;
 

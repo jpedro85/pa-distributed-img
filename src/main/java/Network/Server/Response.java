@@ -1,9 +1,13 @@
+package Network.Server;
+import Utils.Image.ImageTransformer;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
+
 
 /**
  * Represents a response received from a server. This class can be extended to include various types of data depending

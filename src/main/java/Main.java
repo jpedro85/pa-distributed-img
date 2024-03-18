@@ -1,5 +1,8 @@
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import Network.Client.*;
+import Network.Server.*;
+import Utils.Image.*;
 
 public class Main {
 
