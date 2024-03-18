@@ -20,31 +20,34 @@ package Utils.Events.Enums;
  * </p>
  *
  * <ul>
- * <li>{@code STARTING} - Indicates the server is in the process of starting up.
+ * <li>
+ * {@code STARTING} - Indicates the server is in the process of starting up.
  * This state covers the initialization of system resources, loading of
  * configuration settings, and any other preparatory tasks required to bring the
  * server to an operational state.
  * </li>
  *
- * <li>{@code RUNNING} - Signifies that the server is operational and capable of
+ * <li>
+ * {@code RUNNING} - Signifies that the server is operational and capable of
  * handling client requests. In this state, the server is actively serving
  * clients, performing its primary functions.
  * </li>
  *
- * <li>{@code CLOSING} - Represents the state where the server is in the process
+ * <li>
+ * {@code CLOSING} - Represents the state where the server is in the process
  * of shutting down. This state allows for graceful termination, ensuring that
  * ongoing processes are completed and resources are released properly before
  * the server shuts down.
  * </li>
  *
- * <li>{@code UPDATE} - Denotes a special state where the server is undergoing
+ * <li>
+ * {@code UPDATE} - Denotes a special state where the server is undergoing
  * updates. This could involve applying software patches, upgrading system
  * components, or any other maintenance activities that require the server to
  * temporarily suspend normal operations. The server may either automatically
  * enter a maintenance mode or shut down completely, depending on the nature of
  * the updates.
  * </li>
- *
  * </ul>
  *
  * <p>

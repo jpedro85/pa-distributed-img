@@ -1,4 +1,5 @@
 @options
+@packages
 @argfile
 -encoding
 'UTF-8'
@@ -13,7 +14,7 @@
 -charset
 'UTF-8'
 -d
-'/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs'
+'/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs'
 -docencoding
 'UTF-8'
 -doctitle
@@ -22,48 +23,37 @@
 -version
 -windowtitle
 'first-project 1.0-SNAPSHOT API'
+Utils.Events.Enums
+Utils.Events
+Utils.Image
+UI
+Network.Client
+Network.Server
 '/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Main.java'
-'/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Client.java'
-'/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Request.java'
-'/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Response.java'
-'/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/ImageReader.java'
-'/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Server.java'
-'/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/ImageTransformer.java'
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Main.java = 1710412641897
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Client.java = 1709292922000
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Request.java = 1709292922000
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Response.java = 1709292922000
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/ImageReader.java = 1709292922000
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Server.java = 1709292922000
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/ImageTransformer.java = 1709292922000
-/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java = 1710412641897
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/Client.html = 1710431471984
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/Main.html = 1710431472020
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/Server.html = 1710431472060
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/element-list = 1710431472060
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/ImageReader.html = 1710431471996
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/type-search-index.js = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/stylesheet.css = 1710431472116
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/package-tree.html = 1710431472068
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/package-summary.html = 1710431472068
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/member-search-index.js = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/script.js = 1710431472120
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/index-all.html = 1710431472112
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/package-search-index.js = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/package-use.html = 1710431472092
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/help-doc.html = 1710431472116
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/Request.html = 1710431472036
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/module-search-index.js = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/search.js = 1710431472120
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/allclasses-index.html = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/link.svg = 1710431472120
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/Response.html = 1710431472048
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/serialized-form.html = 1710431472076
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/ImageTransformer.html = 1710431472012
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/search.html = 1710431472116
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/tag-search-index.js = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/index.html = 1710431472116
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/copy.svg = 1710431472120
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/overview-tree.html = 1710431472092
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/allpackages-index.html = 1710431472104
-/home/jpedro/workspace/UMa/pa-distributed-img/target/apidocs/search-page.js = 1710431472120
+/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Main.java = 1710785357747
+/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java = 1710785330987
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/Main.html = 1710802110822
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/element-list = 1710802110886
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/type-search-index.js = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/stylesheet.css = 1710802110986
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/package-tree.html = 1710802110894
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/package-summary.html = 1710802110890
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/member-search-index.js = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/script.js = 1710802110990
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/index-all.html = 1710802110982
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/package-search-index.js = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/package-use.html = 1710802110946
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/help-doc.html = 1710802110986
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/overview-summary.html = 1710802110986
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/module-search-index.js = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/search.js = 1710802110990
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/allclasses-index.html = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/link.svg = 1710802110990
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/serialized-form.html = 1710802110914
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/search.html = 1710802110982
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/tag-search-index.js = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/index.html = 1710802110958
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/copy.svg = 1710802110990
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/overview-tree.html = 1710802110958
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/allpackages-index.html = 1710802110970
+/home/jpedro/workspace/UMa/pa-distributed-img/target/site/apidocs/search-page.js = 1710802110990

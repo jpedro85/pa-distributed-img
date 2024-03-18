@@ -17,22 +17,32 @@ package Utils.Events.Enums;
  * Event Types:
  * </p>
  * <ul>
- * <li>{@code IMAGE} - Represents events related to image processing or
+ * <li>
+ * {@code IMAGE} - Represents events related to image processing or
  * manipulation, such as uploading or editing images. Use this type for events
  * that involve image data.
  * </li>
- * <li>{@code ERROR} - Indicates events that are errors or exceptions. This type
+ *
+ * <li>
+ * {@code ERROR} - Indicates events that are errors or exceptions. This type
  * is used for events that signal a malfunction or an unexpected issue that
  * requires attention.
  * </li>
- * <li>{@code REGULAR} - Denotes standard or routine events that occur during
+ *
+ * <li>
+ * {@code REGULAR} - Denotes standard or routine events that occur during
  * normal operation of the system. These events might include user actions that
  * don't fall into more specific categories.
  * </li>
- * <li>{@code EVENT} - A general category for events that don't specifically
- * fit into the other defined types. It serves as a fallback for miscellaneous
- * events.
+ *
+ * <li>
+ * {@code SERVER} - Specifically categorizes events related to server
+ * operations, as status changes, maintenance activities, or any event directly
+ * involving server management and monitoring. This type enhances the
+ * specificity and granularity of event management, particularly for
+ * server-related activities.
  * </li>
+ *
  * </ul>
  *
  * <p>
@@ -58,5 +68,5 @@ public enum EventTypes {
     /**
      * A general category for events not specifically covered by other types.
      */
-    EVENT,
+    SERVER,
 }

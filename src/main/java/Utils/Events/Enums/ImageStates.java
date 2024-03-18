@@ -19,34 +19,38 @@ package Utils.Events.Enums;
  * States:
  * </p>
  * <ul>
- * <li>{@code WAITING_FOR_MESSAGE} - Indicates that the system is waiting for an
+ * <li>
+ * {@code WAITING_FOR_MESSAGE} - Indicates that the system is waiting for an
  * initial message or signal to start processing the image. This state is
  * typically the entry point for new images entering the processing
  * pipeline.
  * </li>
  *
- * <li>{@code WAITING_FOR_PROCESSING} - Represents the state where the image is
+ * <li>
+ * {@code WAITING_FOR_PROCESSING} - Represents the state where the image is
  * queued for processing. The image has been received, but processing has not
  * yet started.
  * </li>
  *
- * <li>{@code PROCESSED} - Signifies that the image has been processed. This
+ * <li>
+ * {@code PROCESSED} - Signifies that the image has been processed. This
  * state indicates completion of the primary image processing steps, but the
  * image may still require further actions such as merging with other images or
  * additional refinement.
  * </li>
  *
- * <li>{@code WAITING_FOR_MERGE} - Indicates that the image is waiting to be
+ * <li>
+ * {@code WAITING_FOR_MERGE} - Indicates that the image is waiting to be
  * merged with other processed images. This state is used in workflows where
  * multiple images are combined into a single output.
  * </li>
  *
- * <li>{@code MERGED} - Denotes that the image has been successfully merged with
+ * <li>
+ * {@code MERGED} - Denotes that the image has been successfully merged with
  * other images. This is typically the final state in the processing workflow,
  * indicating that the image is now fully processed and ready for storage,
  * display, or further use.
  * </li>
- *
  * </ul>
  *
  * <p>

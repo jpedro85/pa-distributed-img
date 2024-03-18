@@ -23,6 +23,7 @@ package Utils.Events.Enums;
  * for event that require attention but do not stop the system from continuing
  * it's operation.
  * </li>
+ *
  * <li>{@code ERROR} - Represents a significant problem that has occurred within
  * the system. An event marked with this severity level indicates a failure that
  * could potentially stop or hinder system operations. Use this level for events
