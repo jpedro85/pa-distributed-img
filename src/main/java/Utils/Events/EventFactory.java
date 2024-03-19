@@ -20,6 +20,9 @@ import Utils.Image.SplitImage;
  */
 public class EventFactory {
 
+    private EventFactory() {
+    };
+
     /**
      * Creates a {@link RegularEvent} with the specified message and event type.
      *
@@ -57,7 +60,8 @@ public class EventFactory {
      * @param splitImage The {@link SplitImage} object associated with the event.
      * @return A new instance of {@link ImageStateEvent}.
      */
-    public static Event createImageStateEvent(String message, EventTypes type, ImageStates imageState, SplitImage splitImage) {
+    public static Event createImageStateEvent(String message, EventTypes type, ImageStates imageState,
+            SplitImage splitImage) {
         return new ImageStateEvent(message, type, imageState, splitImage);
     }
 
