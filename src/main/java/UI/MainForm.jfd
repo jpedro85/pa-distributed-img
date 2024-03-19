@@ -11,13 +11,13 @@ new FormModel {
 				"columns": 1
 			} ) {
 				name: "panel1"
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "BrowseBtn"
-					"text": "Browse"
-				} )
 				add( new FormComponent( "javax.swing.JTextField" ) {
 					name: "ImagePath"
 					"autoscrolls": false
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "BrowseBtn"
+					"text": "Browse"
 				} )
 			} )
 			add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {

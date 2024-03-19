@@ -10,6 +10,13 @@ public class ProgressBar extends JFrame {
     private JButton startButton;
 
     public ProgressBar() {
+        super("Progress");
+        setSize(300, 100);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true); // Configura a barra de progresso para indeterminada
+        getContentPane().add(progressBar, BorderLayout.CENTER);
         initComponents();
     }
 

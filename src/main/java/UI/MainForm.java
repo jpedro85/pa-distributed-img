@@ -1,27 +1,21 @@
 package UI;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.io.*;
-import java.util.Map;
-import java.util.HashMap;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
 
 public class MainForm extends JPanel {
     private JButton addTabButton;
     private JButton removeTabButton;
     private JTabbedPane tabbedPane;
-    private Map<JPanel, ImageIcon> tabImageIcons;
 
     public MainForm() {
         initComponents();
     }
 
     private void initComponents() {
-        tabImageIcons = new HashMap<>();
         // Component initialization
         tabbedPane = new JTabbedPane();
         addTabButton = new JButton("Add Tab");
@@ -54,6 +48,43 @@ public class MainForm extends JPanel {
                 removeLastTab();
             }
         });
+
+        // Create menu panel with buttons
+        JPanel menuPanel = new JPanel();
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+        JButton addServerButton = new JButton("Add Server");
+        JButton removeServerButton = new JButton("Remove Server");
+        JButton startAllButton = new JButton("Start All");
+
+        // Add action listeners to buttons (you can customize these as needed)
+        addServerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Add Server logic here
+            }
+        });
+
+        removeServerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Remove Server logic here
+            }
+        });
+
+        startAllButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Start All logic here
+            }
+        });
+
+        // Add buttons to menu panel
+        menuPanel.add(addServerButton);
+        menuPanel.add(removeServerButton);
+        menuPanel.add(startAllButton);
+
+        // Add menu panel to the MainForm at the left
+        add(menuPanel, BorderLayout.WEST);
     }
 
     // Método para adicionar uma nova aba
@@ -61,7 +92,7 @@ public class MainForm extends JPanel {
         JPanel newPanel = new JPanel(new BorderLayout());
         JButton newBrowseBtn = new JButton("Browse");
         newPanel.add(newBrowseBtn, BorderLayout.NORTH);
-        tabbedPane.addTab("New Tab", newPanel);
+        tabbedPane.addTab("New Client", newPanel);
         newBrowseBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,16 +119,54 @@ public class MainForm extends JPanel {
             File f = fileChooser.getSelectedFile();
             String path = f.getAbsolutePath();
             ImageIcon icon = new ImageIcon(path);
+            Image image = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Resize the image
+            icon = new ImageIcon(image);
             JLabel imageLabel = new JLabel(icon);
-            selectedTabPanel.add(imageLabel, BorderLayout.CENTER);
-            selectedTabPanel.revalidate();
-            selectedTabPanel.repaint();
-            tabImageIcons.put(selectedTabPanel, icon); // Armazenar o ícone da imagem para esta aba
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    new ProgressBar().setVisible(true);
+
+            // Cria um botão "Start"
+            JButton startButton = new JButton("Start");
+
+            // Cria uma nova barra de progresso
+            JProgressBar progressBar = new JProgressBar();
+            progressBar.setStringPainted(true); // Exibe a porcentagem na barra de progresso
+            progressBar.setMaximum(100); // Define o máximo da barra de progresso
+
+            // Adiciona a ação ao botão "Start"
+            startButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    startButtonActionPerformed(e, progressBar);
                 }
             });
+
+            // Adiciona os componentes ao painel
+            JPanel controlPanel = new JPanel();
+            controlPanel.add(startButton);
+            controlPanel.add(progressBar);
+
+            selectedTabPanel.removeAll();
+            selectedTabPanel.setLayout(new BorderLayout());
+            selectedTabPanel.add(imageLabel, BorderLayout.CENTER);
+            selectedTabPanel.add(controlPanel, BorderLayout.SOUTH);
+            selectedTabPanel.revalidate();
+            selectedTabPanel.repaint();
         }
+    }
+
+    // Método chamado quando o botão "Start" é clicado
+    private void startButtonActionPerformed(ActionEvent e, JProgressBar progressBar) {
+        Timer timer = new Timer(100, new ActionListener() {
+            int progress = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                progress += 5; // Incrementa o progresso em 5 a cada 100 milissegundos
+                if (progress > 100) {
+                    ((Timer) e.getSource()).stop(); // Para o timer quando o progresso atinge 100%
+                }
+                progressBar.setValue(progress); // Define o valor da barra de progresso
+            }
+        });
+        timer.start(); // Inicia o timer
     }
 }
