@@ -44,7 +44,7 @@ public class ServerEvent implements Event {
      *                    pertains, facilitating identification and tracking of
      *                    server-specific events.
      */
-    ServerEvent(String message, EventTypes type, ServerStates serverState, int identifier) {
+    public ServerEvent(String message, EventTypes type, ServerStates serverState, int identifier) {
         this.message = message;
         this.eventType = type;
         this.serverState = serverState;

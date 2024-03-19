@@ -47,7 +47,7 @@ public class ImageStateEvent implements Event {
      *                   by {@link ImageStates}.
      * @param splitImage The {@link SplitImage} object that this event pertains to.
      */
-    ImageStateEvent(String message, EventTypes type, ImageStates imageState, SplitImage splitImage) {
+    public ImageStateEvent(String message, EventTypes type, ImageStates imageState, SplitImage splitImage) {
         this.message = message;
         this.eventType = type;
         this.imageState = imageState;

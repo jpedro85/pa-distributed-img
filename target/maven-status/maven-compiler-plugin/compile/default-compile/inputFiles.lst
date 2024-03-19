@@ -1,6 +1,7 @@
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/UI/MainForm.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Network/Server/Response.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Utils/Image/ImageTransformer.java
+/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Utils/Observer/Observer.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Main.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Network/Server/Server.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Utils/Events/RegularEvent.java
@@ -17,3 +18,4 @@
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Utils/Events/ErrorEvent.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Network/Client/Client.java
 /home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Utils/Image/SplitImage.java
+/home/jpedro/workspace/UMa/pa-distributed-img/src/main/java/Utils/Observer/Subject.java

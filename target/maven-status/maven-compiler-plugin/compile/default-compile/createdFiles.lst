@@ -1,7 +1,9 @@
+Utils/Observer/Observer.class
 Utils/Events/Enums/ServerStates.class
 Utils/Events/EventFactory.class
 Utils/Image/ImageTransformer.class
 Utils/Events/Enums/ImageStates.class
+Utils/Observer/Subject.class
 Network/Server/Server$ClientHandler.class
 Utils/Events/ImageStateEvent.class
 Utils/Events/Enums/SeverityLevels.class

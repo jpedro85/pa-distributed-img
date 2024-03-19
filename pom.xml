@@ -17,7 +17,8 @@
     </dependencies>
     <build>
         <plugins>
-
+            <!-- To be able to compile the project in the terminal with mvn clean install or mvn
+            clean package-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -26,12 +27,28 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>Main</mainClass> <!-- Assuming Main is in the default package -->
+                            <mainClass>Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
-
+            <!-- To be able to run the project from the terminal with mvn exec:java-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>Main</mainClass> <!-- Replace Main with your fully qualified main
+                    class name -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

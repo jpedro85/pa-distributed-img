@@ -5,3 +5,4 @@ UI
 Utils.Events
 Utils.Events.Enums
 Utils.Image
+Utils.Observer

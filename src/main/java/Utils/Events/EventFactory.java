@@ -41,7 +41,7 @@ public class EventFactory {
      *                      {@link SeverityLevels}.
      * @return A new instance of {@link ErrorEvent}.
      */
-    public static Event createErrorEvents(String message, EventTypes type, SeverityLevels severityLevel) {
+    public static Event createErrorEvent(String message, EventTypes type, SeverityLevels severityLevel) {
         return new ErrorEvent(message, type, severityLevel);
     }
 
@@ -57,8 +57,7 @@ public class EventFactory {
      * @param splitImage The {@link SplitImage} object associated with the event.
      * @return A new instance of {@link ImageStateEvent}.
      */
-    public static Event creteImageStateEvent(String message, EventTypes type, ImageStates imageState,
-            SplitImage splitImage) {
+    public static Event createImageStateEvent(String message, EventTypes type, ImageStates imageState, SplitImage splitImage) {
         return new ImageStateEvent(message, type, imageState, splitImage);
     }
 

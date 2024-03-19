@@ -6,7 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * The ImageReader class implements a file reader. The path of the file is specified as an argument of each method.
+ * The ImageReader class implements a file reader. The path of the file is
+ * specified as an argument of each method.
  */
 public class ImageReader {
 
@@ -15,12 +16,12 @@ public class ImageReader {
      *
      * @return a BufferedImage containing the decoded contents of the path, or null
      */
-    public static BufferedImage readImage ( String path ) {
+    public static BufferedImage readImage(String path) {
         BufferedImage result = null;
         try {
-            result = ImageIO.read ( new File ( path ) );
-        } catch ( IOException e ) {
-            e.printStackTrace ( );
+            result = ImageIO.read(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return result;
     }

@@ -43,7 +43,7 @@ public class RegularEvent implements Event {
      *                  system operations. This type aids in event handling and
      *                  processing strategies.
      */
-    RegularEvent(String message, EventTypes eventType) {
+    public RegularEvent(String message, EventTypes eventType) {
         this.message = message;
         this.eventType = eventType;
     }

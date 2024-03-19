@@ -41,7 +41,7 @@ public class ErrorEvent implements Event {
      * @param severityLevel the severity level of the error, indicating its
      *                      potential impact.
      */
-    ErrorEvent(String message, EventTypes type, SeverityLevels severityLevel) {
+    public ErrorEvent(String message, EventTypes type, SeverityLevels severityLevel) {
 
         this.message = message;
         this.eventType = type;
