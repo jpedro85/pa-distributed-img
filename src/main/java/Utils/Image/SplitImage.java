@@ -25,8 +25,8 @@ import java.awt.image.BufferedImage;
  */
 public class SplitImage {
 
-    private short columnNumber;
-    private short lineNumber;
+    private final short columnNumber;
+    private final short lineNumber;
     private BufferedImage image;
 
     /**
