@@ -1,15 +1,16 @@
 package UI;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 
 public class MainForm extends JPanel {
     private JButton addTabButton;
     private JButton removeTabButton;
     private JTabbedPane tabbedPane;
+    private JTextArea serverInfoTextArea; // Nova caixa de texto para informações dos servidores
 
     public MainForm() {
         initComponents();
@@ -49,7 +50,7 @@ public class MainForm extends JPanel {
             }
         });
 
-        // Create menu panel with buttons
+        // Create menu panel with buttons and server info text area
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         JButton addServerButton = new JButton("Add Server");
@@ -78,10 +79,17 @@ public class MainForm extends JPanel {
             }
         });
 
-        // Add buttons to menu panel
+        // Create server info text area
+        serverInfoTextArea = new JTextArea(5, 20); // 5 rows, 20 columns
+        serverInfoTextArea.setEditable(false); // Make it read-only
+        JScrollPane scrollPane = new JScrollPane(serverInfoTextArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        // Add buttons and server info text area to menu panel
         menuPanel.add(addServerButton);
         menuPanel.add(removeServerButton);
         menuPanel.add(startAllButton);
+        menuPanel.add(scrollPane); // Add the scroll pane containing the text area
 
         // Add menu panel to the MainForm at the left
         add(menuPanel, BorderLayout.WEST);

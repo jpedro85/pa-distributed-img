@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import Network.Client.*;
 import Network.Server.*;
@@ -7,15 +8,36 @@ import Utils.Image.*;
 
 public class Main {
 
-    public static void main ( String[] args ) {
-        Server server = new Server ( 8888 );
-        server.start ( );
-        JFrame frame = new JFrame("Main Form");
-        MainForm mainForm = new MainForm();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(mainForm);
-        frame.pack();
-        frame.setVisible(true);
+        public static void main(String[] args) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    createAndShowGUI();
+                }
+            });
+        }
+
+        private static void createAndShowGUI() {
+            JFrame frame = new JFrame("Main Form");
+            MainForm mainForm = new MainForm();
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(mainForm);
+
+            // Obtém as dimensões da tela
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int screenWidth = screenSize.width;
+            int screenHeight = screenSize.height;
+
+            // Define o tamanho mínimo da janela com base nas dimensões da tela
+            int minWidth = Math.min(1440, screenWidth);
+            int minHeight = Math.min(1080, screenHeight);
+            frame.setMinimumSize(new Dimension(minWidth, minHeight));
+
+            frame.pack();
+            frame.setVisible(true);
+        }
+    }
+
 
 //        BufferedImage sampleImage = ImageReader.readImage("sample.png");
 //        //Java Swing stuff
@@ -45,6 +67,4 @@ public class Main {
 //        frame.setVisible ( true );
 
 
-    }
 
-}
