@@ -18,6 +18,11 @@ public class MainForm extends JPanel {
 
     public MainForm() {
         initComponents();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new ProgressBar().setVisible(true);
+            }
+        });
     }
 
     private void initComponents() {
