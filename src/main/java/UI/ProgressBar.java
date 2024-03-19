@@ -70,5 +70,13 @@ public class ProgressBar extends JFrame {
         });
         thread.start(); // Inicia a thread
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new ProgressBar().setVisible(true);
+            }
+        });
+    }
 }
 

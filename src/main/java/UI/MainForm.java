@@ -18,11 +18,6 @@ public class MainForm extends JPanel {
 
     public MainForm() {
         initComponents();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new ProgressBar().setVisible(true);
-            }
-        });
     }
 
     private void initComponents() {
@@ -98,6 +93,11 @@ public class MainForm extends JPanel {
             selectedTabPanel.revalidate();
             selectedTabPanel.repaint();
             tabImageIcons.put(selectedTabPanel, icon); // Armazenar o ícone da imagem para esta aba
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    new ProgressBar().setVisible(true);
+                }
+            });
         }
     }
 }
