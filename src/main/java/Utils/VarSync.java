@@ -71,7 +71,7 @@ public class VarSync<T>{
     /**
      * @return stored value without locking. Util in a multi statement context.
      */
-    public T asyncGetVar(){
+    public T asyncGet(){
         return this.value;
     }
 
@@ -79,7 +79,7 @@ public class VarSync<T>{
      * Replaces value with newValue without locking. Util in a multi statement context.
      * @param newValue value to replace the current value.
      */
-    public void asyncSetVar( T newValue){
+    public void asyncSet( T newValue){
         this.value = newValue;
     }
 

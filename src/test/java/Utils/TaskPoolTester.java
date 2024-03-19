@@ -1,8 +1,8 @@
+package Utils;
+
 import Utils.TaskPool;
+
 import org.junit.jupiter.api.*;
-
-import javax.swing.plaf.TableHeaderUI;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Tests for TaskPool")
@@ -132,7 +132,7 @@ public class TaskPoolTester {
         //wait for threads to sleep
         try { Thread.sleep(100); }catch (Exception e) { e.printStackTrace();}
         //awake one threads by adding one task
-        myTaskPool.addTask(new Task(4, "t3"));
+        myTaskPool.addTask(new Task(4, "t4"));
 
         myTaskPool.pause();
 
@@ -144,9 +144,9 @@ public class TaskPoolTester {
 
         this.myTaskPool.start();
 
-        this.myTaskPool.addTask(new Task(5,"T1"));
+        this.myTaskPool.addTask( new Task(5,"T1") );
         try { Thread.sleep(500); }catch (Exception e) { e.printStackTrace();}
-        this.myTaskPool.addTask(new Task(10,"T2"));
+        this.myTaskPool.addTask( new Task(10,"T2") );
         try { Thread.sleep(100); }catch (Exception e) { e.printStackTrace();}
 
         assertEquals(2,this.myTaskPool.getNumberOfRunningTasks());
@@ -194,5 +194,56 @@ public class TaskPoolTester {
         try { Thread.sleep(10); }catch (Exception e) { e.printStackTrace();}
         assertTrue( this.myTaskPool.isTaskRunning(t1) );
     }
+
+    @Test
+    @DisplayName( "Test is addExecuter" )
+    void addExecutorTest(){
+
+        int nExecutors = this.myTaskPool.getSize();
+        this.myTaskPool.addExecutors(1);
+        assertEquals(nExecutors + 1, this.myTaskPool.getSize());
+
+        this.myTaskPool.start();
+
+        try { Thread.sleep(100); }catch (Exception e) { e.printStackTrace(); }
+
+        nExecutors = this.myTaskPool.getSize() ;
+        this.myTaskPool.addExecutors(1);
+
+        assertEquals(nExecutors + 1, this.myTaskPool.getSize());
+
+    }
+
+    @Test
+    @DisplayName( "Test is removeExecuter" )
+    void removeExecutorTest(){
+
+        int nExecutors = this.myTaskPool.getSize();
+        assertTrue( this.myTaskPool.removeExecutors(1) );
+        assertFalse( this.myTaskPool.removeExecutors(1) );
+
+        this.myTaskPool.addExecutors(1);
+
+        this.myTaskPool.start();
+        assertTrue( this.myTaskPool.removeExecutors(1) );
+        assertFalse( this.myTaskPool.removeExecutors(1) );
+
+    }
+
+    @Test
+    @DisplayName( "Test is isPaused" )
+    void isPausedTest(){
+
+        this.myTaskPool.start();
+        this.myTaskPool.addTask( new Task(6,"t1"));
+        try { Thread.sleep(100); }catch (Exception e) { e.printStackTrace(); }
+        assertEquals(1 , this.myTaskPool.getNumberOfRunningTasks());
+        this.myTaskPool.pause();
+
+        try { Thread.sleep(1100); }catch (Exception e) { e.printStackTrace(); }
+
+        assertEquals(0 , this.myTaskPool.getNumberOfRunningTasks());
+    }
+
 
 }
