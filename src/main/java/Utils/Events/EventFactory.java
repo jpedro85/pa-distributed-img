@@ -24,27 +24,56 @@ public class EventFactory {
     };
 
     /**
-     * Creates a {@link RegularEvent} with the specified message and event type.
+     * Creates a {@link RegularEvent} for logging and tracking standard operations.
+     * This event type is suitable for routine activities, such as user actions or
+     * system updates, that do not require special handling or categorization as
+     * errors or system states.
      *
-     * @param message The message describing the event.
-     * @param type    The type of the event, as defined by {@link EventTypes}.
-     * @return A new instance of {@link RegularEvent}.
+     * @param message The message describing the event, not null or empty.
+     * @param type    The type of the event, as defined by {@link EventTypes}, not
+     *                null.
+     * @return A new instance of {@link RegularEvent}, never null.
+     * @throws IllegalArgumentException if any argument is null or if message is
+     *                                  empty.
      */
     public static Event createRegularEvent(String message, EventTypes type) {
+        if (message == null || message.trim().isEmpty()) {
+            throw new IllegalArgumentException("Message must not be null or empty.");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("Event type must not be null.");
+        }
+        if (type != EventTypes.REGULAR) {
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+        }
         return new RegularEvent(message, type);
     }
 
     /**
-     * Creates an {@link ErrorEvent} with the specified message, event type, and
-     * severity level.
+     * Creates an {@link ErrorEvent} for logging errors with a specified severity
+     * level. Use this event type for exceptions or system errors that need
+     * attention or special handling. The severity level helps in categorizing the
+     * urgency of the error.
      *
-     * @param message       The message describing the event.
-     * @param type          The type of the event, as defined by {@link EventTypes}.
+     * @param message       The message describing the event, not null or empty.
+     * @param type          The type of the event, as defined by {@link EventTypes},
+     *                      not null.
      * @param severityLevel The severity level of the event, as defined by
-     *                      {@link SeverityLevels}.
-     * @return A new instance of {@link ErrorEvent}.
+     *                      {@link SeverityLevels}, not null.
+     * @return A new instance of {@link ErrorEvent}, never null.
+     * @throws IllegalArgumentException if any argument is null, or if message is
+     *                                  empty.
      */
     public static Event createErrorEvent(String message, EventTypes type, SeverityLevels severityLevel) {
+        if (message == null || message.trim().isEmpty()) {
+            throw new IllegalArgumentException("Message must not be null or empty.");
+        }
+        if (type == null || severityLevel == null) {
+            throw new IllegalArgumentException("Event type and severity level must not be null.");
+        }
+        if (type != EventTypes.ERROR) {
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+        }
         return new ErrorEvent(message, type, severityLevel);
     }
 
@@ -60,8 +89,17 @@ public class EventFactory {
      * @param splitImage The {@link SplitImage} object associated with the event.
      * @return A new instance of {@link ImageStateEvent}.
      */
-    public static Event createImageStateEvent(String message, EventTypes type, ImageStates imageState,
-            SplitImage splitImage) {
+    public static Event createImageStateEvent(String message, EventTypes type, ImageStates imageState, SplitImage splitImage) {
+
+        if (message == null || message.trim().isEmpty()) {
+            throw new IllegalArgumentException("Message must not be null or empty.");
+        }
+        if (type == null || imageState == null || splitImage == null) {
+            throw new IllegalArgumentException("Event type, imageState and splitImage must not be null.");
+        }
+        if (type != EventTypes.IMAGE) {
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+        }
         return new ImageStateEvent(message, type, imageState, splitImage);
     }
 
@@ -77,6 +115,15 @@ public class EventFactory {
      * @return A new instance of {@link ServerEvent}.
      */
     public static Event createServerEvent(String message, EventTypes type, ServerStates serverState, int identifier) {
+        if (message == null || message.trim().isEmpty()) {
+            throw new IllegalArgumentException("Message must not be null or empty.");
+        }
+        if (type == null || serverState == null) {
+            throw new IllegalArgumentException("Event type, imageState and splitImage must not be null.");
+        }
+        if (type != EventTypes.SERVER) {
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+        }
         return new ServerEvent(message, type, serverState, identifier);
     }
 }
