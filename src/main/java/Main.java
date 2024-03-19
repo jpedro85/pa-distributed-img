@@ -2,7 +2,8 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import Network.Client.*;
 import Network.Server.*;
-import Utils.Image.*;
+import Utils.Image.ImageReader;
+import Utils.Image.ImageTransformer;
 
 public class Main {
 
