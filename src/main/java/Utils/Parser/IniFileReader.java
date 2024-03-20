@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class IniFileReader {
 
-    private static IniFileReader instance = new IniFileReader();
+    private static final IniFileReader instance = new IniFileReader();
 
     private IniFileReader() {
     }
@@ -17,7 +17,6 @@ public class IniFileReader {
 
     public Ini readIniFile(String filePath) throws IOException {
         File configFile = new File(filePath);
-        Ini iniFile = new Ini(configFile);
-        return iniFile;
+        return new Ini(configFile);
     }
 }

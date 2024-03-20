@@ -44,6 +44,7 @@ class ConfigParserTest {
         Config result = configParser.parseFromIniToConfig("validConfig");
 
         assertNotNull(result);
+        assertInstanceOf(Config.class, result);
         assertEquals(2, result.getServerAmount());
         assertEquals(10, result.getTaskPoolSize());
         assertEquals(5, result.getColumns());
