@@ -1,55 +1,16 @@
-package Utils.Events;
+package Utils.Events.InterfaceEvents;
 
-import Utils.Events.Enums.EventTypes;
 import Utils.Events.Enums.InterfaceEvents;
-import Utils.Events.Enums.ImageStates;
+import Utils.Events.Event;
 
-public class InterfaceEvent implements Event{
-
-    private final String message;
-    private final EventTypes eventType;
-    private final InterfaceEvents event;
-
-    /**
-     * Constructs a new ImageStateEvent with the specified details.
-     *
-     * @param message    The message describing the event.
-     * @param type       The general category of the event, as defined by
-     *                   {@link EventTypes}.
-     * @param event      The event category as defined by
-     *                   {@link InterfaceEvents}.
-     */
-    public InterfaceEvent(String message, EventTypes type , InterfaceEvents event) {
-        this.message = message;
-        this.eventType = type;
-        this.event = event;
-    }
-
-    @Override
-    public EventTypes getType() {
-        return this.eventType;
-    }
-
-    @Override
-    public String getMessage() {
-        return this.message;
-    }
+/**
+ * This interface definesthe methods needes for an InterfaceEvent of {@link InterfaceEvents}
+ */
+public interface InterfaceEvent extends Event {
 
     /**
-     * Returns the current state of the image processing task.
-     *
-     * @return The image processing state as an instance of {@link ImageStates}.
+     * @return the {@link InterfaceEvents} type of this event
      */
-    public ImageStates getImageState() {
-        return imageState;
-    }
+    public InterfaceEvents getEvent();
 
-    /**
-     * Returns the {@link SplitImage} object that this event pertains to.
-     *
-     * @return The {@link SplitImage} object associated with this event.
-     */
-    public SplitImage getSplitImage() {
-        return splitImage;
-    }
 }

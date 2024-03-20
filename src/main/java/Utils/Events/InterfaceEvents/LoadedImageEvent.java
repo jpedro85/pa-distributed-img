@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
  * Represents an event indicating the loading of a new image.
  * This event provides information such as the type of event, message, event type, name of the image, and the image itself.
  */
-public class NewLoadedImageEvent implements InterfaceEvent{
+public class LoadedImageEvent implements InterfaceEvent{
 
     private final EventTypes eventType;
     private final String message;
@@ -18,22 +18,21 @@ public class NewLoadedImageEvent implements InterfaceEvent{
 
     /**
      * Construct
-     * @param eventType
-     * @param message
-     * @param event
-     * @param name
-     * @param image
+     *   @param message     The message describing the event.
+     *   @param eventType   The general category of the event, as defined by {@link EventTypes}.
+     *   @param name        A String that identifies the image.(e.g. the path)
+     *   @param image       The image that as been loaded
      */
-    public NewLoadedImageEvent(EventTypes eventType, String message, InterfaceEvents event, String name, BufferedImage image) {
+    public LoadedImageEvent(EventTypes eventType, String message, String name, BufferedImage image) {
         this.eventType = eventType;
         this.message = message;
-        this.event = event;
+        this.event = InterfaceEvents.LOADED_IMAGE;
         this.name = name;
         this.image = image;
     }
 
     /**
-     * The type of event (e.g., SUCCESS, ERROR).
+     * @return The type of event (e.g., SUCCESS, ERROR).
      */
     @Override
     public EventTypes getType() {
@@ -41,22 +40,31 @@ public class NewLoadedImageEvent implements InterfaceEvent{
     }
 
     /**
-     * A message associated with the event.
+     * @return A message associated with the event.
      */
     @Override
     public String getMessage() {
         return this.message;
     }
 
+    /**
+     * @return The specific interface event of {@link InterfaceEvents}.
+     */
     @Override
     public InterfaceEvents getEvent() {
         return this.event;
     }
 
+    /**
+     * @return Name of the image path of the image
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return BufferedImage the loaded image
+     */
     public BufferedImage getImage() {
         return image;
     }
