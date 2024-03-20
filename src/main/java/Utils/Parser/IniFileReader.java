@@ -2,6 +2,7 @@ package Utils.Parser;
 
 import org.ini4j.Ini;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class IniFileReader {
@@ -16,7 +17,11 @@ public class IniFileReader {
     }
 
     public Ini readIniFile(String filePath) throws IOException {
-        File configFile = new File(filePath);
-        return new Ini(configFile);
+        try {
+            File configFile = new File(filePath);
+            return new Ini(configFile);
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException("File not found.");
+        }
     }
 }
