@@ -7,29 +7,28 @@ import org.ini4j.Ini;
 public class ConfigParser {
 
     private static final ConfigParser instance = new ConfigParser();
+    private IniFileReader iniFileReader;
 
     private ConfigParser() {
     }
 
-    public static ConfigParser getInstance() {
-        return instance;
-    }
-
     public Config parseFromIniToConfig(String filePath) throws IOException {
-            IniFileReader reader = IniFileReader.getInstance();
-            Ini configFile = reader.readIniFile(filePath);
+        if (this.iniFileReader == null) {
+            this.iniFileReader = IniFileReader.getInstance();
+        }
+        Ini configFile = this.iniFileReader.readIniFile(filePath);
 
-            Config config = new Config();
+        Config config = new Config();
 
-            validateSectionExists(configFile, "server");
-            config.setServerAmount(parseInteger(configFile, "server", "serverAmount"));
-            config.setTaskPoolSize(parseInteger(configFile, "server", "taskPoolSize"));
+        validateSectionExists(configFile, "server");
+        config.setServerAmount(parseInteger(configFile, "server", "serverAmount"));
+        config.setTaskPoolSize(parseInteger(configFile, "server", "taskPoolSize"));
 
-            validateSectionExists(configFile, "image");
-            config.setColumns(parseInteger(configFile, "image", "columns"));
-            config.setRows(parseInteger(configFile, "image", "rows"));
+        validateSectionExists(configFile, "image");
+        config.setColumns(parseInteger(configFile, "image", "columns"));
+        config.setRows(parseInteger(configFile, "image", "rows"));
 
-            return config;
+        return config;
     }
 
     private void validateSectionExists(Ini configFile, String section) {
@@ -48,5 +47,14 @@ public class ConfigParser {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format for '" + key + "' in [" + section + "] section.");
         }
+    }
+
+    public static ConfigParser getInstance() {
+        return instance;
+    }
+
+    // Method to inject a mock IniFileReader
+    public void setIniFileReader(IniFileReader iniFileReader) {
+        this.iniFileReader = iniFileReader;
     }
 }
