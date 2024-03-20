@@ -69,4 +69,8 @@ public enum EventTypes {
      * A general category for events not specifically covered by other types.
      */
     SERVER,
+    /**
+     * Indicates that a user initiated an event.
+     */
+    INTERFACE
 }
