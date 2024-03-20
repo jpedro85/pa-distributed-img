@@ -1,25 +1,42 @@
 package Network.Client;
 
 import Network.Server.Response;
+import Utils.Events.Enums.EventTypes;
+import Utils.Events.Enums.ImageStates;
+import Utils.Events.Enums.SeverityLevels;
+import Utils.Events.Event;
+import Utils.Events.EventFactory;
+import Utils.Image.ImageTransformer;
 import Utils.Image.SplitImage;
 import Network.Server.LoadTrackerReader;
 import Network.Server.Request;
+import Utils.Observer.Observer;
+import Utils.Observer.Subject;
+import Utils.VarSync;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 // TODO: Documentation
 // TODO: Implement Unit tests;
-public class SlaveClient extends Thread {
+public class SlaveClient extends Thread implements Subject {
 
-    private LoadTrackerReader serverLoadTrackerReader;
-    private SplitImage splitImage;
+    private final VarSync<ArrayList<Observer>> observers;
+    private LoadTrackerReader serverLoadTrackerReader;//todo:
+    private final SplitImage splitImage;
+    private final BufferedImage[][] resultSplittedImage;
 
-    public SlaveClient(SplitImage splitImage) {
+    public SlaveClient(BufferedImage[][] resultSplittedImage,SplitImage splitImage)
+    {
         this.splitImage = splitImage;
+        this.resultSplittedImage = resultSplittedImage;
+        this.setName( "SlaveClient L:" + splitImage.getLineNumber() + "  C:" + splitImage.getColumnNumber() );
+        this.observers = new VarSync<ArrayList<Observer>>( new ArrayList<Observer>() );
     }
 
     @Override
@@ -27,7 +44,13 @@ public class SlaveClient extends Thread {
         // TODO: Implement LoadTrackerReader
         // TODO: Pass the config from the loadconfig.
         // sendRequestAndReceiveResponse(host, port, request);
+        //todo: put result in array
         System.out.println("Not Implemented Yet");
+//        Response response = sendRequestAndReceiveResponse(host, port, request);
+//        BufferedImage image = ImageTransformer.createImageFromBytes(response.getImageSection() );
+//        SplitImage receivedSplitImage = new SplitImage(this.getSplitImage().getColumnNumber(), this.splitImage.getLineNumber(), image);
+//        Event eventWaitingForMerge = EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.WAITING_FOR_MERGE, receivedSplitImage);
+//        this.notify(eventWaitingForMerge);
     }
 
     /**
@@ -47,21 +70,17 @@ public class SlaveClient extends Thread {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
             // Send the request to the server
-            System.out.println("Connecting to server at " + host + ":" + port);
-            System.out.println("Sending: " + request);
+            Event eventWaitingForServer = EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.WAITING_FOR_PROCESSING, null);
+            this.notify(eventWaitingForServer);
             out.writeObject(request);
 
             // Wait for and return the response from the server
             Response response = (Response) in.readObject();
-            System.out.println("Received: " + response);
             return response;
 
-        } catch (UnknownHostException e) {
-            System.err.println("Server not found: " + e.getMessage());
-        } catch (IOException e) {
-            System.err.println("I/O Error: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            System.err.println("Class not found: " + e.getMessage());
+        } catch (Exception e) {
+            Event event = EventFactory.createErrorEvent( e.getMessage() , EventTypes.ERROR, SeverityLevels.ERROR );
+            this.notify(event);
         }
         // Return null or consider a better error handling/return strategy
         return null;
@@ -73,5 +92,34 @@ public class SlaveClient extends Thread {
 
     public SplitImage getSplitImage() {
         return splitImage;
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+
+        this.observers.lock();
+        if ( !this.observers.asyncGet().contains(observer) )
+            this.observers.asyncGet().add(observer);
+        this.observers.unlock();
+
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+
+        this.observers.lock();
+        this.observers.asyncGet().remove(observer);
+        this.observers.unlock();
+    }
+
+    @Override
+    public void notify(Event event) {
+
+        this.observers.lock();
+        for ( Observer observer : this.observers.asyncGet() )
+        {
+            observer.update(this, event);
+        }
+        this.observers.unlock();
     }
 }
