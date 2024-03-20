@@ -1,4 +1,5 @@
 package Network.Server;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +11,7 @@ import Utils.VarSync;
 /**
  * A singleton class for tracking server load information.
  */
-public class ServerLoadTracker {
+public class ServerLoadTracker implements LoadTrackerEdit {
     private static ServerLoadTracker instance;
     private final VarSync<File> fileVarSync;
 
@@ -38,7 +39,7 @@ public class ServerLoadTracker {
      */
     public void setFilePath(String path) {
         fileVarSync.syncSet(new File(path));
-        checkFileCreation(); // Check if the file is created when setting the file path
+        checkFileCreation();
     }
 
     /**
@@ -96,21 +97,171 @@ public class ServerLoadTracker {
             }
         }
     }
-//    public static void main(String[] args) {
-//        // Instanciando o ServerLoadTracker
-//        ServerLoadTracker loadTracker = ServerLoadTracker.getInstance();
+
+
+    /**
+     * Updates the load information for a specific server.
+     * @param serverIdentifier the identifier of the server
+     * @param running the number of running processes
+     * @param waiting the number of waiting processes
+     */
+    @Override
+    public void update(int serverIdentifier, int running, int waiting) {
+        // Create a temporary file to store updated data
+        File tempFile = new File("temp_load_info.txt");
+
+        // Lock the fileVarSync to prevent concurrent access
+        fileVarSync.lock();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Split the line to get serverIdentifier, running, and waiting values
+                String[] parts = line.split("=");
+                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", "")); // Extract numeric part from server identifier
+                if (currentServerIdentifier == serverIdentifier) {
+                    // Update the load information for the server
+                    writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
+                } else {
+                    // Write the unchanged line to the temporary file
+                    writer.write(line + "\n");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Unlock the fileVarSync
+            fileVarSync.unlock();
+        }
+
+        // Replace the original file with the temporary file
+        File originalFile = fileVarSync.asyncGet();
+        if (!originalFile.delete()) {
+            System.err.println("Failed to delete original file.");
+            return;
+        }
+
+        if (!tempFile.renameTo(originalFile)) {
+            System.err.println("Failed to rename temporary file.");
+        }
+    }
+
+    /**
+     * Adds a new entry to the load information for a server.
+     * @param serverIdentifier the identifier of the server
+     * @param running the number of running processes
+     * @param waiting the number of waiting processes
+     */
+    @Override
+    public void addEntry(int serverIdentifier, int running, int waiting) {
+        fileVarSync.lock();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileVarSync.asyncGet(), true))) {
+            writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            fileVarSync.unlock();
+        }
+    }
+
+    /**
+     * Removes an entry from the load information for a server.
+     * @param serverIdentifier the identifier of the server
+     */
+    @Override
+    public void removeEntry(int serverIdentifier) {
+        // Create a temporary file to store updated data
+        File tempFile = new File("temp_load_info.txt");
+
+        // Lock the fileVarSync to prevent concurrent access
+        fileVarSync.lock();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Split the line to get serverIdentifier
+                String[] parts = line.split("=");
+                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", "")); // Extract numeric part from server identifier
+                if (currentServerIdentifier != serverIdentifier) {
+                    // Write the unchanged line to the temporary file
+                    writer.write(line + "\n");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Unlock the fileVarSync
+            fileVarSync.unlock();
+        }
+
+        // Replace the original file with the temporary file
+        File originalFile = fileVarSync.asyncGet();
+        if (!originalFile.delete()) {
+            System.err.println("Failed to delete original file.");
+            return;
+        }
+
+        if (!tempFile.renameTo(originalFile)) {
+            System.err.println("Failed to rename temporary file.");
+        }
+    }
+//    /**
+//     * Gets the load for a specific server.
+//     * @param serverIdentifier the identifier of the server
+//     * @return the load value for the specified server
+//     */
+//    @Override
+//    public int getLoad(int serverIdentifier) {
+//        // Lock the fileVarSync to prevent concurrent access
+//        fileVarSync.lock();
+//        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split("=");
+//                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
+//                if (currentServerIdentifier == serverIdentifier) {
+//                    // Extract the load value for the specified server
+//                    return Integer.parseInt(parts[1].split(",")[0]); // Assuming load is stored before ","
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            // Unlock the fileVarSync
+//            fileVarSync.unlock();
+//        }
+//        return -1; // Return -1 if the server identifier is not found
+//    }
 //
-//        // Definindo o caminho do arquivo
-//        String filePath = "load_info.txt";
-//        loadTracker.setFilePath(filePath);
+//    /**
+//     * Gets the identifier of the server with the least load.
+//     * @return the identifier of the server with the least load
+//     */
+//    @Override
+//    public int getServerWithLessLoad() {
+//        int minLoad = Integer.MAX_VALUE;
+//        int serverWithLessLoad = -1;
 //
-//        // Escrevendo alguns dados de carga
-//        loadTracker.writeLoadInfo("server1", 0.75);
-//        loadTracker.writeLoadInfo("server2", 0.85);
-//        loadTracker.writeLoadInfo("server3", 0.65);
-//
-//        // Lendo os dados de carga
-//        String loadInfo = loadTracker.readLoadInfo();
-//        System.out.println("Dados de carga lidos:\n" + loadInfo);
+//        // Lock the fileVarSync to prevent concurrent access
+//        fileVarSync.lock();
+//        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                String[] parts = line.split("=");
+//                int currentLoad = Integer.parseInt(parts[1].split(",")[0]); // Assuming load is stored before ","
+//                if (currentLoad < minLoad) {
+//                    minLoad = currentLoad;
+//                    serverWithLessLoad = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            // Unlock the fileVarSync
+//            fileVarSync.unlock();
+//        }
+//        return serverWithLessLoad;
 //    }
 }
