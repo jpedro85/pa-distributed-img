@@ -64,18 +64,13 @@ public enum ImageStates {
      * The system is waiting for an initial message or signal to start processing
      * the image.
      */
-    WAITING_FOR_MESSAGE,
+    PREPARED_FOR_PROCESSING,
 
     /**
      * The image is queued for processing but has not yet started the processing
      * phase.
      */
     WAITING_FOR_PROCESSING,
-
-    /**
-     * The image has been processed and is awaiting further actions such as merging.
-     */
-    PROCESSED,
 
     /**
      * The image is waiting to be merged with other processed images.
@@ -87,4 +82,9 @@ public enum ImageStates {
      * processed.
      */
     MERGED,
+
+    /**
+     * The image has been successfully saved.
+     */
+    SAVED
 }
