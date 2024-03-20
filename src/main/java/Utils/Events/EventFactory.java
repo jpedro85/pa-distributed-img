@@ -1,7 +1,12 @@
 package Utils.Events;
 
 import Utils.Events.Enums.*;
+import Utils.Events.InterfaceEvents.InterfaceEventWithName;
+import Utils.Events.InterfaceEvents.InterfaceEventWithNames;
+import Utils.Events.InterfaceEvents.LoadedImageEvent;
 import Utils.Image.SplitImage;
+
+import java.awt.image.BufferedImage;
 
 /**
  * A factory class for creating instances of various types of events in the
@@ -78,9 +83,8 @@ public class EventFactory {
     }
 
     /**
-     * Creates an {@link ImageStateEvent} with the specified message, event type,
-     * image state,
-     * and split image object.
+     * Creates an {@link ImageStateEvent} with the specified message,
+     * event type, image state, and split image object.
      *
      * @param message    The message describing the event.
      * @param type       The type of the event, as defined by {@link EventTypes}.
@@ -126,4 +130,86 @@ public class EventFactory {
         }
         return new ServerEvent(message, type, serverState, identifier);
     }
+
+    /**
+     * Creates a {@link LoadedImageEvent} with the specified message, event type, name,
+     * and loaded image.
+     *
+     * @param message     The message describing the event.
+     * @param type        Eventype.IMAGE.
+     * @param name        The name associated with the loaded image.
+     * @param loadedImage The loaded image.
+     * @return A new instance of {@link LoadedImageEvent}.
+     */
+    public static Event createLoadedImageEvent(String message, EventTypes type, String name, BufferedImage loadedImage)
+    {
+        if (message == null || message.trim().isEmpty())
+            throw new IllegalArgumentException("Message must not be null or empty.");
+
+        if (name == null || name.trim().isEmpty())
+            throw new IllegalArgumentException("Name must not be null or empty.");
+
+        if ( loadedImage == null )
+            throw new IllegalArgumentException("loadedImage must not be null.");
+
+        if (type != EventTypes.IMAGE)
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+
+        return new LoadedImageEvent(type,message,name,loadedImage);
+    }
+
+    /**
+     * Creates a {@link InterfaceEventWithNames} with the specified message, event type, interface event,
+     * and array of names. An event that relates to a name identifier.
+     *
+     * @param message    The message describing the event.
+     * @param eventType  IMAGE
+     * @param events     The specific interface event, as defined by {@link InterfaceEvents}.
+     * @param names      An array of names associated with the event.
+     * @return A new instance of {@link InterfaceEventWithNames}.
+     */
+    public static Event createInterfaceEventWithNames(String message, EventTypes eventType, InterfaceEvents events, String[] names)
+    {
+        if (message == null || message.trim().isEmpty())
+            throw new IllegalArgumentException("Message must not be null or empty.");
+
+        if (names == null || names.length < 1 )
+            throw new IllegalArgumentException("Name must not be null or empty.");
+
+        if ( events != InterfaceEvents.START_ALL && events != InterfaceEvents.CANCEL_ALL )
+            throw new IllegalArgumentException("Event needs to be one of {START_ALL,CANCEL_ALL}.");
+
+        if (eventType != EventTypes.IMAGE)
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+
+        return new InterfaceEventWithNames( eventType, events, message, names );
+    }
+
+    /**
+     * Creates a {@link InterfaceEventWithName} with the specified message, event type, interface event,
+     * and single name.
+     *
+     * @param message    The message describing the event.
+     * @param eventType  The type of the event, as defined by {@link EventTypes}.
+     * @param events     The specific interface event, as defined by {@link InterfaceEvents}.
+     * @param name       A single name associated with the event.
+     * @return A new instance of {@link InterfaceEventWithName}.
+     */
+    public static Event createInterfaceEventWithName(String message, EventTypes eventType, InterfaceEvents events, String name)
+    {
+        if ( message == null || message.trim().isEmpty() )
+            throw new IllegalArgumentException("Message must not be null or empty.");
+
+        if ( name == null || name.trim().isEmpty() )
+            throw new IllegalArgumentException("Name must not be null or empty.");
+
+        if ( events != InterfaceEvents.START && events != InterfaceEvents.CANCEL && events != InterfaceEvents.UNLOADED_IMAGE )
+            throw new IllegalArgumentException("Event needs to be one of {START,CANCEL,UNLOADED_IMAGE}.");
+
+        if ( eventType != EventTypes.IMAGE )
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+
+        return new InterfaceEventWithName( eventType, events, message, name );
+    }
+
 }
