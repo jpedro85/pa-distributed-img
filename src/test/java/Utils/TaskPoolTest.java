@@ -1,12 +1,10 @@
 package Utils;
 
-import Utils.TaskPool;
-
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Tests for TaskPool")
-public class TaskPoolTester {
+public class TaskPoolTest {
 
     TaskPool myTaskPool;
 
