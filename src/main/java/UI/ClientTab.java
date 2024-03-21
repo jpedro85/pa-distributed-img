@@ -6,8 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import Utils.Observer.Observer;
+import Utils.Observer.Subject;
+import Utils.Events.Event;
 
-public class ClientTab extends JPanel {
+public class ClientTab extends JPanel implements Observer, Subject{
+
     private JTabbedPane tabbedPane;
     private JLabel imageLabel;
 
@@ -87,5 +91,25 @@ public class ClientTab extends JPanel {
     private void startButtonActionPerformed() {
         // Lógica para a ação do botão "Start"
         // Implemente aqui o que deseja fazer ao clicar no botão "Start"
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+        System.out.println("Not implemented yet");
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        System.out.println("Not implemented yet");
+    }
+
+    @Override
+    public void notify(Event event) {
+        System.out.println("Not implemented yet");
+    }
+
+    @Override
+    public void update(Subject subject, Event event) {
+        System.out.println("Not implemented yet");
     }
 }

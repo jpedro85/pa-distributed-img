@@ -1,6 +1,9 @@
 package Utils.Events;
 
 import Utils.Events.Enums.*;
+import Utils.Events.InterfaceEvents.InterfaceEventWithName;
+import Utils.Events.InterfaceEvents.InterfaceEventWithNames;
+import Utils.Events.InterfaceEvents.LoadedImageEvent;
 import Utils.Image.SplitImage;
 
 import java.awt.image.BufferedImage;
@@ -272,4 +275,189 @@ class EventFactoryTest {
             EventFactory.createServerEvent(message, type, null, identifier);
         });
     }
+
+    @Test
+    @DisplayName("Create a LoadedImageEvent and validate its properties")
+    void testCreateLoadedImageEvent_ValidInput() {
+        String message = "Test LoadedImageEvent";
+        EventTypes type = EventTypes.IMAGE;
+        String name = "Test Image";
+        BufferedImage loadedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+
+        Event event = EventFactory.createLoadedImageEvent(message, type, name, loadedImage);
+
+        assertNotNull(event);
+        assertTrue(event instanceof LoadedImageEvent);
+        assertEquals(message, event.getMessage());
+        assertEquals(type, event.getType());
+        LoadedImageEvent loadedImageEvent = (LoadedImageEvent) event;
+        assertEquals(name, loadedImageEvent.getName());
+        assertEquals(loadedImage, loadedImageEvent.getImage());
+    }
+
+    @Test
+    @DisplayName("Create a LoadedImageEvent but with Null Message")
+    void testCreateLoadedImageEvent_NullMessage() {
+        EventTypes type = EventTypes.IMAGE;
+        String name = "Test Image";
+        BufferedImage loadedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createLoadedImageEvent(null, type, name, loadedImage);
+        });
+    }
+
+    @Test
+    @DisplayName("Create a LoadedImageEvent but with Null Name")
+    void testCreateLoadedImageEvent_NullName() {
+        String message = "Test LoadedImageEvent";
+        EventTypes type = EventTypes.IMAGE;
+        BufferedImage loadedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createLoadedImageEvent(message, type, null, loadedImage);
+        });
+    }
+
+    @Test
+    @DisplayName("Create a LoadedImageEvent but with Null LoadedImage")
+    void testCreateLoadedImageEvent_NullLoadedImage() {
+        String message = "Test LoadedImageEvent";
+        EventTypes type = EventTypes.IMAGE;
+        String name = "Test Image";
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createLoadedImageEvent(message, type, name, null);
+        });
+    }
+
+    @Test
+    @DisplayName("Create a LoadedImageEvent but with Incorrect EventType")
+    void testCreateLoadedImageEvent_IncorrectEventType() {
+        String message = "Test LoadedImageEvent";
+        EventTypes type = EventTypes.REGULAR;
+        String name = "Test Image";
+        BufferedImage loadedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createLoadedImageEvent(message, type, name, loadedImage);
+        });
+    }
+
+    // Test createInterfaceEventWithNames method
+    @Test
+    @DisplayName("Create an InterfaceEventWithNames and validate its properties")
+    void testCreateInterfaceEventWithNames_ValidInput() {
+        String message = "Test InterfaceEventWithNames";
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START_ALL;
+        String[] names = {"Name1", "Name2", "Name3"};
+
+        Event event = EventFactory.createInterfaceEventWithNames(message, type, events, names);
+
+        assertNotNull(event);
+        assertTrue(event instanceof InterfaceEventWithNames);
+        assertEquals(message, event.getMessage());
+        assertEquals(type, event.getType());
+        InterfaceEventWithNames interfaceEventWithNames = (InterfaceEventWithNames) event;
+        assertEquals(events, interfaceEventWithNames.getEvent());
+        assertArrayEquals(names, interfaceEventWithNames.getNames());
+    }
+
+    @Test
+    @DisplayName("Create an InterfaceEventWithNames but with Null Message")
+    void testCreateInterfaceEventWithNames_NullMessage() {
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START_ALL;
+        String[] names = {"Name1", "Name2", "Name3"};
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createInterfaceEventWithNames(null, type, events, names);
+        });
+    }
+
+    @Test
+    @DisplayName("Create an InterfaceEventWithNames but with Null Names")
+    void testCreateInterfaceEventWithNames_NullNames() {
+        String message = "Test InterfaceEventWithNames";
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START_ALL;
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createInterfaceEventWithNames(message, type, events, null);
+        });
+    }
+
+    @Test
+    @DisplayName("Create an InterfaceEventWithNames but with Empty Names")
+    void testCreateInterfaceEventWithNames_EmptyNames() {
+        String message = "Test InterfaceEventWithNames";
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START_ALL;
+        String[] names = {};
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createInterfaceEventWithNames(message, type, events, names);
+        });
+    }
+
+    @Test
+    @DisplayName("Create an InterfaceEventWithNames but with Incorrect EventType")
+    void testCreateInterfaceEventWithNames_IncorrectEventType() {
+        String message = "Test InterfaceEventWithNames";
+        EventTypes type = EventTypes.REGULAR;
+        InterfaceEvents events = InterfaceEvents.START_ALL;
+        String[] names = {"Name1", "Name2", "Name3"};
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createInterfaceEventWithNames(message, type, events, names);
+        });
+    }
+
+    // Test createInterfaceEventWithName method
+    @Test
+    @DisplayName("Create an InterfaceEventWithName and validate its properties")
+    void testCreateInterfaceEventWithName_ValidInput() {
+        String message = "Test InterfaceEventWithName";
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START;
+        String name = "Name1";
+
+        Event event = EventFactory.createInterfaceEventWithName(message, type, events, name);
+
+        assertNotNull(event);
+        assertTrue(event instanceof InterfaceEventWithName);
+        assertEquals(message, event.getMessage());
+        assertEquals(type, event.getType());
+        InterfaceEventWithName interfaceEventWithName = (InterfaceEventWithName) event;
+        assertEquals(events, interfaceEventWithName.getEvent());
+        assertEquals(name, interfaceEventWithName.getName());
+    }
+
+    @Test
+    @DisplayName("Create an InterfaceEventWithName but with Null Message")
+    void testCreateInterfaceEventWithName_NullMessage() {
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START;
+        String name = "Name1";
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createInterfaceEventWithName(null, type, events, name);
+        });
+    }
+
+    @Test
+    @DisplayName("Create an InterfaceEventWithName but with Null Name")
+    void testCreateInterfaceEventWithName_NullName() {
+        String message = "Test InterfaceEventWithName";
+        EventTypes type = EventTypes.IMAGE;
+        InterfaceEvents events = InterfaceEvents.START;
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            EventFactory.createInterfaceEventWithName(message, type, events, null);
+        });
+    }
+
+
+
 }

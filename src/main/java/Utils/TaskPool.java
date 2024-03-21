@@ -7,7 +7,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 
 /**
- * A task pool that executes Runnable objects in separate threads.
+ * Represents a task pool that manages the execution of Runnable objects in multiple threads.
+ * <p>
+ * The TaskPool class provides a flexible and efficient way to distribute tasks across a pool
+ * of executor threads, allowing for parallel execution of tasks. It manages a queue of tasks,
+ * executes them using a pool of executor threads, and provides methods for controlling the
+ * execution flow, such as starting, pausing, adding, and removing tasks and executors.
+ *
+ * <p>Features:
+ * <ul>
+ *   <li>Manages a pool of executor threads to execute Runnable tasks concurrently.</li>
+ *   <li>Supports dynamic addition and removal of executor threads based on workload.</li>
+ *   <li>Allows pausing and resuming the execution of tasks in the pool.</li>
+ *   <li>Ensures thread safety using synchronization and locks.</li>
+ *   <li>Provides methods to add, remove, and query tasks in the pool.</li>
+ * </ul>
+ *
+ * <p>
+ * The TaskPool class is designed to be highly customizable and suitable for various
+ * multithreading task execution scenarios.
  */
 public class TaskPool {
 
@@ -23,10 +41,11 @@ public class TaskPool {
     private final Condition awaitTasks;
 
     /**
-    * Initializes a task pool with the specified size. Also creates its executors in the paused state.
-    *
-    * @param size The size of the task pool (number of executors threads).
-    */
+     * Initializes a task pool with the specified size. Also creates its executors in the paused state.
+     *
+     * @param size        The size of the task pool (number of executor threads).
+     * @param waitingTime The time limit to wait for a task in milliseconds,without checking for new tasks.
+     */
     public TaskPool(int size,int waitingTime)
     {
         this.waitingTime = waitingTime;
@@ -45,8 +64,9 @@ public class TaskPool {
     }
 
     /**
+     * Initializes a task pool with the specified size and default waiting time of 100 milliseconds.
      *
-     * @param size The size of the task pool (number of executors threads).
+     * @param size The size of the task pool ( number of executor threads ).
      */
     public TaskPool(int size)
     {
@@ -55,6 +75,8 @@ public class TaskPool {
 
     /**
      * Initializes the executor threads.
+     *
+     * @param numberOfExecutors The number of executor threads to initialize.
      */
     private void initializeTaskExecutors(int numberOfExecutors)
     {
@@ -109,6 +131,8 @@ public class TaskPool {
     }
 
     /**
+     * Checks if the task pool is paused. The TaskPool is paused if his state is paused and all his executors are not executing.
+     *
      * @return <b>True</b> if the internal state is <b>paused</b> and all executors are <b>not executing</b>.
      */
     public boolean isPaused(){
@@ -117,7 +141,7 @@ public class TaskPool {
 
     /**
      * Adds a task to the pool only if <b>task</b> does <b>not</b> already exists in the poll
-     * <p>
+     *
      * @param task , task to be executed in the pool;
      */
     public void addTask(Runnable task)
@@ -159,7 +183,7 @@ public class TaskPool {
     /**
      * Check if a task is currently running in a pool
      *
-     * @param task , to check if it is running;
+     * @param task The to check if it is running;
      * @return <b>True</b> if the task is currently running.
      */
     public boolean isTaskRunning(Runnable task){
@@ -183,7 +207,7 @@ public class TaskPool {
     /**
      * Adds n new Executor to the task pool. if the curren state is running also starts the executor.
      * <p>
-     * @param numberOfExecutors number of executors to add
+     * @param numberOfExecutors The number of executors to add
      */
     public void addExecutors(int numberOfExecutors)
     {
@@ -214,7 +238,7 @@ public class TaskPool {
 
     /**
      * Removes n Executors. The removed executors will finish their current task.
-     * <p>
+     *
      * @param numberOfExecutors number of executors to remove. The minimum number oof executors is 1;
      * @return <b>true</b> if successfully removed
      */
@@ -241,14 +265,18 @@ public class TaskPool {
     }
 
     /**
-     * @return the <b>size</b> of the pool.
+     * Gets the current size of the pool.
+     *
+     * @return The size of the pool.
      */
     public int getSize(){
         return this.taskExecutors.syncGet().size();
     }
 
     /**
-     * @return the actual number of running tasks of the pool.
+     * Gets the actual number of running tasks in the pool.
+     *
+     * @return The number of running tasks in the pool.
      */
     public int getNumberOfRunningTasks()
     {
@@ -256,8 +284,9 @@ public class TaskPool {
     }
 
     /**
+     * Gets the number of tasks waiting to be executed.
      *
-     * @return the number of tasks waiting to be executed
+     * @return The number of tasks waiting to be executed.
      */
     public int getNumberOfWaitingTasks()
     {
@@ -267,10 +296,25 @@ public class TaskPool {
 
 
 
-
-
     /**
-     * TaskExecutor class
+     * Represents a worker thread responsible for executing tasks in the TaskPool.
+     *
+     * <p>The TaskExecutor class encapsulates the behavior of individual worker threads
+     * within the TaskPool. Each TaskExecutor instance runs in its own thread and
+     * continuously picks up tasks from the TaskPool's task queue for execution.
+     *
+     * <p>Key Features:
+     * <ul>
+     *   <li>Runs in its own thread and executes tasks asynchronously.</li>
+     *   <li>Picks tasks from the task queue and executes them sequentially.</li>
+     *   <li>Supports pausing and resuming the execution of tasks based on pool state.</li>
+     *   <li>Manages its own state, including whether it is currently running or paused.</li>
+     *   <li>Ensures thread safety when accessing shared resources using synchronization.</li>
+     * </ul>
+     * <p>
+     * The TaskExecutor class is an integral part of the TaskPool infrastructure,
+     * providing the concurrency mechanism for executing tasks concurrently in a
+     * controlled manner.
      */
     private class TaskExecutor extends Thread{
 
@@ -279,8 +323,10 @@ public class TaskPool {
         private VarSync<Boolean> isPaused;
 
         /**
-         * Initializes TaskExecutor
-         * @param waitingTime limit time to wait for a task. Time to recheck if a task exists and a signal was missed
+         * Initializes a new TaskExecutor with the specified waiting time.
+         *
+         * @param waitingTime The time to wait for a task in milliseconds when
+         *                    checking for new tasks.
          */
         public TaskExecutor(int waitingTime)
         {
@@ -289,6 +335,10 @@ public class TaskPool {
             this.waitingTime = waitingTime;
         }
 
+        /**
+         * Starts the TaskExecutor thread for executing tasks.
+         * If the TaskExecutor is currently paused, it will resume execution.
+         */
         @Override
         public void start()
         {
@@ -304,7 +354,9 @@ public class TaskPool {
         }
 
         /**
-         * Set the TaskExecuter to pause execution, will wait until the current task is finished;
+         * Pauses the execution of tasks by the TaskExecutor.
+         *
+         * <p>The TaskExecutor only pause after the current task is finished.
          */
         public void pause()
         {
@@ -341,9 +393,13 @@ public class TaskPool {
         }
 
         /**
-         * Pick a task.If TaskPoll is empty waits until for signal that a new task is available, periodically checks if a signal was missed.
-         * if TaskPoll is paused stops waiting and <b>return null</b>.
-         * @return Runnable the task to be executed
+         * Picks the next task from the task queue for execution.
+         *
+         * <p>If no tasks are available and the TaskExecutor is running, it will
+         * wait for a signal that a new task is available.
+         * <p>At the interval of <b>waitingTime</b> will check is a new task is available.
+         *
+         * @return The next task to be executed, or null if no tasks are available.
          */
         private Runnable pickNextTask()
         {
@@ -373,6 +429,11 @@ public class TaskPool {
             return task;
         }
 
+        /**
+         * Starts the execution of a task.
+         *
+         * <p>Updates the count of running tasks in the TaskPool.
+         */
         private void startTask()
         {
             tasksRunning.lock();
@@ -381,6 +442,11 @@ public class TaskPool {
             tasksRunning.unlock();
         }
 
+        /**
+         * Ends the execution of a task.
+         *
+         * <p>Updates the count of running tasks in the TaskPool.
+         */
         private void endTask()
         {
             tasksRunning.lock();

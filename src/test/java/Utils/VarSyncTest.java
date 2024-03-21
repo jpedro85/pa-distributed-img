@@ -3,7 +3,7 @@ package Utils;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class VarSyncTester {
+public class VarSyncTest {
 
     @Test
     @DisplayName("Test syncGet() and syncSet()")

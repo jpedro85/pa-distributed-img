@@ -1,5 +1,7 @@
 package Utils.Parser;
 
+import java.nio.file.Paths;
+
 /**
  * Represents configuration settings for the system, encapsulating various
  * parameters such as server amount, task pool size, and dimensions in which are
@@ -18,7 +20,7 @@ public class Config {
     private int taskPoolSize;
     private int columns;
     private int rows;
-
+    private final String savePath = Paths.get("src","results").toString();
     /**
      * Gets the configured amount of servers to be used by the system.
      *
@@ -91,5 +93,14 @@ public class Config {
      */
     public void setRows(int rows) {
         this.rows = rows;
+    }
+
+    /**
+     * Gets the save path that image is going to be saved.
+     *
+     * @return The save path;
+     */
+    public String getSavePath() {
+        return savePath;
     }
 }

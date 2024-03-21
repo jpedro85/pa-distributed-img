@@ -4,7 +4,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Generic Class that merges a var and a lock. Util when we need to sync a single variable.
- * @param <T> Type of the var
+ * Useful when synchronization of a single variable is required.
+ * @param <T> Type of the variable.
  */
 public class VarSync<T>{
 
@@ -13,7 +14,7 @@ public class VarSync<T>{
 
     /**
      * Creates an instance of VarSync
-     * <p>
+     *
      * @param value variable to sync
      * @param fair if the lock is fair, that means the lock respect the order of lock calls.
      */
@@ -24,7 +25,7 @@ public class VarSync<T>{
 
     /**
      * Creates an instance of VarSync with the default value of fair as true
-     * <p>
+     *
      * @param value value to sync
      */
     public VarSync(T value){
@@ -33,22 +34,23 @@ public class VarSync<T>{
     }
 
     /**
-     * Locks the lock
+     * Acquires the lock.
      */
     public void lock(){
         this.lock.lock();
     }
 
     /**
-     * unlocks the lock
+     * Releases the lock.
      */
     public void unlock(){
         this.lock.unlock();
     }
 
     /**
-     * Locks and get de value
-     * @return actual value of the stored var
+     * Retrieves the current value of the variable after acquiring the lock.
+     *
+     * @return The current value of the stored variable.
      */
     public T syncGet(){
         T var;
@@ -59,8 +61,9 @@ public class VarSync<T>{
     }
 
     /**
-     * Lock and set the value to newValue
-     * @param newValue value to replace the current value.
+     * Sets the value of the variable to the specified newValue after acquiring the lock.
+     *
+     * @param newValue The value to replace the current value.
      */
     public void syncSet(T newValue){
         this.lock.lock();
@@ -69,22 +72,29 @@ public class VarSync<T>{
     }
 
     /**
-     * @return stored value without locking. Util in a multi statement context.
+     * Retrieves the current value of the variable without acquiring the lock.
+     * Useful in a multi-statement context where <b>already acquired the lock</>.
+     *
+     * @return The current value of the stored variable.
      */
     public T asyncGet(){
         return this.value;
     }
 
     /**
-     * Replaces value with newValue without locking. Util in a multi statement context.
-     * @param newValue value to replace the current value.
+     * Sets the value of the variable to the specified newValue without acquiring the lock.
+     * Useful in a multi-statement context where we <b>already acquired the lock</>.
+     *
+     * @param newValue The value to replace the current value.
      */
     public void asyncSet( T newValue){
         this.value = newValue;
     }
 
     /**
-     * @return Returns the lock.
+     * Retrieves the ReentrantLock used for synchronization.
+     *
+     * @return The ReentrantLock object associated with this VarSync instance.
      */
     public ReentrantLock getLock(){
         return this.lock;
