@@ -1,11 +1,6 @@
 package Network.Server;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import Utils.VarSync;
 
 /**
@@ -107,36 +102,37 @@ public class ServerLoadTracker implements LoadTrackerEdit {
      */
     @Override
     public void update(int serverIdentifier, int running, int waiting) {
-        // Create a temporary file to store updated data
-        File tempFile = new File("temp_load_info.txt");
+        File originalFile = fileVarSync.asyncGet();
+        File tempFile = new File(originalFile.getAbsolutePath() + ".temp");
 
-        // Lock the fileVarSync to prevent concurrent access
         fileVarSync.lock();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()));
+        try (BufferedReader reader = new BufferedReader(new FileReader(originalFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
             String line;
+            boolean serverUpdated = false; // Flag to track if the server's load info has been updated
             while ((line = reader.readLine()) != null) {
-                // Split the line to get serverIdentifier, running, and waiting values
                 String[] parts = line.split("=");
-                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", "")); // Extract numeric part from server identifier
+                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
                 if (currentServerIdentifier == serverIdentifier) {
-                    // Update the load information for the server
                     writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
+                    serverUpdated = true;
                 } else {
-                    // Write the unchanged line to the temporary file
                     writer.write(line + "\n");
                 }
+            }
+
+            // If the server's load info was not updated, add a new entry
+            if (!serverUpdated) {
+                writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            // Unlock the fileVarSync
             fileVarSync.unlock();
         }
 
         // Replace the original file with the temporary file
-        File originalFile = fileVarSync.asyncGet();
         if (!originalFile.delete()) {
             System.err.println("Failed to delete original file.");
             return;
@@ -171,33 +167,28 @@ public class ServerLoadTracker implements LoadTrackerEdit {
      */
     @Override
     public void removeEntry(int serverIdentifier) {
-        // Create a temporary file to store updated data
-        File tempFile = new File("temp_load_info.txt");
+        File originalFile = fileVarSync.asyncGet();
+        File tempFile = new File(originalFile.getAbsolutePath() + ".temp");
 
-        // Lock the fileVarSync to prevent concurrent access
         fileVarSync.lock();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()));
+        try (BufferedReader reader = new BufferedReader(new FileReader(originalFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                // Split the line to get serverIdentifier
                 String[] parts = line.split("=");
-                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", "")); // Extract numeric part from server identifier
+                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
                 if (currentServerIdentifier != serverIdentifier) {
-                    // Write the unchanged line to the temporary file
                     writer.write(line + "\n");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            // Unlock the fileVarSync
             fileVarSync.unlock();
         }
 
         // Replace the original file with the temporary file
-        File originalFile = fileVarSync.asyncGet();
         if (!originalFile.delete()) {
             System.err.println("Failed to delete original file.");
             return;
@@ -207,61 +198,4 @@ public class ServerLoadTracker implements LoadTrackerEdit {
             System.err.println("Failed to rename temporary file.");
         }
     }
-//    /**
-//     * Gets the load for a specific server.
-//     * @param serverIdentifier the identifier of the server
-//     * @return the load value for the specified server
-//     */
-//    @Override
-//    public int getLoad(int serverIdentifier) {
-//        // Lock the fileVarSync to prevent concurrent access
-//        fileVarSync.lock();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] parts = line.split("=");
-//                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
-//                if (currentServerIdentifier == serverIdentifier) {
-//                    // Extract the load value for the specified server
-//                    return Integer.parseInt(parts[1].split(",")[0]); // Assuming load is stored before ","
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            // Unlock the fileVarSync
-//            fileVarSync.unlock();
-//        }
-//        return -1; // Return -1 if the server identifier is not found
-//    }
-//
-//    /**
-//     * Gets the identifier of the server with the least load.
-//     * @return the identifier of the server with the least load
-//     */
-//    @Override
-//    public int getServerWithLessLoad() {
-//        int minLoad = Integer.MAX_VALUE;
-//        int serverWithLessLoad = -1;
-//
-//        // Lock the fileVarSync to prevent concurrent access
-//        fileVarSync.lock();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] parts = line.split("=");
-//                int currentLoad = Integer.parseInt(parts[1].split(",")[0]); // Assuming load is stored before ","
-//                if (currentLoad < minLoad) {
-//                    minLoad = currentLoad;
-//                    serverWithLessLoad = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            // Unlock the fileVarSync
-//            fileVarSync.unlock();
-//        }
-//        return serverWithLessLoad;
-//    }
 }
