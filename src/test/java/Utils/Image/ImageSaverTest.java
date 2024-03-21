@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileNotFoundException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,6 @@ class ImageSaverTest {
 
         boolean result = ImageSaver.saveImage(testImage, format, filePath);
 
-        assertFalse(result);
+        assertFalse(result, "(No such file or directory)");
     }
-
 }

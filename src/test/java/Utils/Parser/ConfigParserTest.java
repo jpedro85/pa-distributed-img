@@ -20,23 +20,18 @@ class ConfigParserTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-
         mockIniFileReader = Mockito.mock(IniFileReader.class);
+    }
+
+    @Test
+    public void parseFromIniToConfig_ValidConfig_ReturnsConfigObject() throws IOException {
 
         Ini mockIni = new Ini();
         mockIni.put("server", "serverAmount", "2");
         mockIni.put("server", "taskPoolSize", "10");
         mockIni.put("image", "columns", "5");
         mockIni.put("image", "rows", "4");
-        lenient().when(mockIniFileReader.readIniFile("validConfig")).thenReturn(mockIni);
-
-        Ini mockIniMissing = new Ini();
-
-        lenient().when(mockIniFileReader.readIniFile("invalidConfig")).thenReturn(mockIniMissing);
-    }
-
-    @Test
-    public void parseFromIniToConfig_ValidConfig_ReturnsConfigObject() throws IOException {
+        when(mockIniFileReader.readIniFile("validConfig")).thenReturn(mockIni);
 
         ConfigParser configParser = ConfigParser.getInstance();
         configParser.setIniFileReader(mockIniFileReader);
@@ -52,14 +47,15 @@ class ConfigParserTest {
     }
 
     @Test
-    public void parseFromIniToConfig_MissingSection_ThrowsIllegalArgumentException() {
-        // Setup
+    public void parseFromIniToConfig_MissingSection_ThrowsIllegalArgumentException() throws IOException {
+        Ini mockIniMissing = new Ini();
+
+        when(mockIniFileReader.readIniFile("configWithInvalidValue")).thenReturn(mockIniMissing);
+
         ConfigParser configParser = ConfigParser.getInstance();
         configParser.setIniFileReader(mockIniFileReader);
 
-        // Execute & Verify
-        assertThrows(IllegalArgumentException.class, () -> {
-            configParser.parseFromIniToConfig("invalidConfig");
-        });
+        assertThrows(IllegalArgumentException.class, () -> configParser.parseFromIniToConfig("configWithInvalidValue"),
+                "Expected to throw due to invalid integer value.");
     }
 }
