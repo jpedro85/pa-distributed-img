@@ -8,6 +8,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import Utils.Observer.Observer;
 import Utils.Observer.Subject;
+import Utils.Events.Event;
 
 public class ClientTab extends JPanel implements Observer, Subject{
 
