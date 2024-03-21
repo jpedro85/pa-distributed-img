@@ -1,8 +1,8 @@
 package Utils.Events.Enums;
 
 /**
-    * Enum representing various events that can occur within the interface.
-*/
+ * Enum representing various events that can occur within the interface.
+ */
 public enum InterfaceEvents {
 
     /**
@@ -16,12 +16,12 @@ public enum InterfaceEvents {
     UNLOADED_IMAGE,
 
     /**
-     * Event indicating that the button <b>start all</b>  as been pressed.
+     * Event indicating that the button <b>start all</b> as been pressed.
      */
     START_ALL,
 
     /**
-     * Event indicating that the button <b>cancel all</b>  as been pressed.
+     * Event indicating that the button <b>cancel all</b> as been pressed.
      */
     CANCEL_ALL,
 

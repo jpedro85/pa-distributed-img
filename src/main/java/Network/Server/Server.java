@@ -24,13 +24,13 @@ import java.util.ArrayList;
  * </p>
  * <p>
  * The following events are emitted:
+ * </p>
  * <ul>
  *     <li>Server Starting Event: Signifies the initiation of the server's operation.</li>
  *     <li>Server Running Event: Indicates that the server is actively accepting client connections.</li>
  *     <li>Server Closed Event: Signifies the closure of the server and the termination of client connections.</li>
  *     <li>Error Event: Indicates occurrences of errors during the server's operation.</li>
  * </ul>
- * </p>
  */
 public class Server extends Thread implements Subject {
 

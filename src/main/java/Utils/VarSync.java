@@ -73,7 +73,7 @@ public class VarSync<T>{
 
     /**
      * Retrieves the current value of the variable without acquiring the lock.
-     * Useful in a multi-statement context where <b>already acquired the lock</>.
+     * Useful in a multi-statement context where <b>already acquired the lock</b>.
      *
      * @return The current value of the stored variable.
      */
@@ -83,7 +83,7 @@ public class VarSync<T>{
 
     /**
      * Sets the value of the variable to the specified newValue without acquiring the lock.
-     * Useful in a multi-statement context where we <b>already acquired the lock</>.
+     * Useful in a multi-statement context where we <b>already acquired the lock</b>.
      *
      * @param newValue The value to replace the current value.
      */

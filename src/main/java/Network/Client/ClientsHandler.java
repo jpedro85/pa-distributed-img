@@ -33,6 +33,7 @@ import java.util.ArrayList;
  *   individual MasterClient instances, thereby maximizing processing throughput and resource utilization.
  * - Configuration Flexibility: Integrates with configuration settings to adjust parameters such as image segmentation
  *   dimensions and server load tracking, providing customizable options to optimize processing performance.
+ * </p>
  */
 public class ClientsHandler implements Observer {
 
@@ -58,6 +59,7 @@ public class ClientsHandler implements Observer {
     /**
      * Creates a new MasterClient instance with the provided client name and image.
      *
+     * @param tab        The client tab
      * @param clientName The name of the client.
      * @param image      The image to be processed.
      */
