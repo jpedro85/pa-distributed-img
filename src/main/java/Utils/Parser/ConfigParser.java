@@ -54,6 +54,8 @@ public class ConfigParser {
         validateSectionExists(configFile, "server");
         config.setServerAmount(parseInteger(configFile, "server", "serverAmount"));
         config.setTaskPoolSize(parseInteger(configFile, "server", "taskPoolSize"));
+        config.setStartPort(parseInteger(configFile, "server", "startPort"));
+        config.setMaxServersNumber(parseInteger(configFile, "server", "maxServers"));
 
         validateSectionExists(configFile, "image");
         config.setColumns(parseInteger(configFile, "image", "columns"));
