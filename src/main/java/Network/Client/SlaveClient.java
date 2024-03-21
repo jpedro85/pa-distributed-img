@@ -22,36 +22,80 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-// TODO: Documentation
-// TODO: Implement Unit tests;
+/**
+ * The {@code SlaveClient} class represents a client responsible for processing a portion of an image
+ * by communicating with servers and managing observers for event notifications.
+ * It extends {@code Thread} and implements the {@code Subject} interface.
+ */
 public class SlaveClient extends Thread implements Subject {
 
     private final VarSync<ArrayList<Observer>> observers;
-    private LoadTrackerReader serverLoadTrackerReader;//todo:
+    private LoadTrackerReader serverLoadTrackerReader;
     private final SplitImage splitImage;
     private final BufferedImage[][] resultSplittedImage;
+    private final LoadTrackerReader loadTrackerReader;
+    private final String name;
 
-    public SlaveClient(BufferedImage[][] resultSplittedImage,SplitImage splitImage)
+    public SlaveClient(BufferedImage[][] resultSplittedImage,SplitImage splitImage, String name,LoadTrackerReader loadTrackerReader)
     {
         this.splitImage = splitImage;
         this.resultSplittedImage = resultSplittedImage;
         this.setName( "SlaveClient L:" + splitImage.getLineNumber() + "  C:" + splitImage.getColumnNumber() );
         this.observers = new VarSync<ArrayList<Observer>>( new ArrayList<Observer>() );
+        this.loadTrackerReader = loadTrackerReader;
+        this.name = name;
     }
 
     @Override
-    public void run() {
-        // TODO: Implement LoadTrackerReader
-        // TODO: Pass the config from the loadconfig.
-        // sendRequestAndReceiveResponse(host, port, request);
-        //todo: put result in array
-        System.out.println("Not Implemented Yet");
-//        Response response = sendRequestAndReceiveResponse(host, port, request);
-//        BufferedImage image = ImageTransformer.createImageFromBytes(response.getImageSection() );
-//        SplitImage receivedSplitImage = new SplitImage(this.getSplitImage().getColumnNumber(), this.splitImage.getLineNumber(), image);
-//        Event eventWaitingForMerge = EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.WAITING_FOR_MERGE, receivedSplitImage);
-//        this.notify(eventWaitingForMerge);
+    public void run()
+    {
+        // create request
+        String message = String.format("Image:%s SubImage(L:%d C:%d )", this.name, this.splitImage.getLineNumber(), this.splitImage.getColumnNumber() );
+        Request request = new Request("Ask to process", message, this.splitImage.getImage());
+
+        int lastErrorPort = 0;
+        int errorCount = 0;
+        int port;
+
+        // send request, retry if fail until all  try with all server and repeat the same twice and fail
+        do
+        {
+            port = this.loadTrackerReader.getServerWithLessLoad();
+            Response response = sendRequestAndReceiveResponse("localhost", port, request);
+            if (response != null)
+            {
+                this.handleResponse(response, message);
+                break;
+            }
+            else
+            {
+                if (port == lastErrorPort)
+                    errorCount++;
+                else
+                {
+                    lastErrorPort = port;
+                    errorCount = 1;
+                }
+            }
+        }
+        while( errorCount <=2 );
     }
+
+    private void handleResponse( Response response, String message)
+    {
+        if( response.getMessage().equals( message ) )
+        {
+            BufferedImage image = ImageTransformer.createImageFromBytes(response.getImageSection() );
+            SplitImage receivedSplitImage = new SplitImage(this.splitImage.getColumnNumber(), this.splitImage.getLineNumber(), image);
+
+            this.resultSplittedImage[receivedSplitImage.getLineNumber()][receivedSplitImage.getColumnNumber()] = receivedSplitImage.getImage();
+
+            this.notify( EventFactory.createImageStateEvent( "Image Finished Processing", EventTypes.IMAGE, ImageStates.WAITING_FOR_MERGE, receivedSplitImage) );
+        }
+        else
+            this.notify( EventFactory.createErrorEvent("The received response does not correspond to sent request.", EventTypes.ERROR,SeverityLevels.ERROR ) );
+    }
+
 
     /**
      * Sends an object to a specified server and waits for a response.
