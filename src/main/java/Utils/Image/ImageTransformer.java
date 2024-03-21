@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+
 /**
  * The ImageTransformer class implements a set of methods for performing transformations (split, join, and red removal)
  * in a specified image.
@@ -59,6 +60,26 @@ public class ImageTransformer {
                 int g = c.getGreen ( );
                 int b = c.getBlue ( );
                 resultingImage.setRGB ( i , j , new Color ( 0 , g , b ).getRGB ( ) );
+            }
+        }
+        return resultingImage;
+    }
+
+    /**
+     * Converts a given BufferedImage to grayscale.
+     *
+     * @param image The input BufferedImage to be converted to grayscale.
+     * @return A new BufferedImage representing the grayscale version of the input image.
+     */
+    public static BufferedImage convertToGrayScale ( BufferedImage image ) {
+        int width = image.getWidth ( );
+        int height = image.getHeight ( );
+        Color c;
+        BufferedImage resultingImage = new BufferedImage ( width , height , BufferedImage.TYPE_INT_RGB );
+        for ( int i = 0 ; i < width ; i++ ) {
+            for ( int j = 0 ; j < height ; j++ ) {
+                c = new Color ( image.getRGB ( i , j ) );
+                resultingImage.setRGB ( i , j , new Color (   (int)Math.floor(c.getRed() * 0.2)  , (int)Math.floor(c.getRed() * 0.2) , (int)Math.floor(c.getRed() * 0.2) ).getRGB ( ) );
             }
         }
         return resultingImage;

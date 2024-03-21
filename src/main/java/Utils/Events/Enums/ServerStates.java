@@ -72,7 +72,7 @@ public enum ServerStates {
      * The server is in the process of shutting down, ensuring all processes are
      * gracefully completed.
      */
-    CLOSING,
+    CLOSED,
 
     /**
      * The server is undergoing updates, which may require temporary suspension of
