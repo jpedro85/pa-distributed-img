@@ -6,7 +6,7 @@ import Utils.VarSync;
 /**
  * A singleton class for tracking server load information.
  */
-public class ServerLoadTracker implements LoadTrackerEdit {
+public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
     private static ServerLoadTracker instance;
     private final VarSync<File> fileVarSync;
 
@@ -21,7 +21,7 @@ public class ServerLoadTracker implements LoadTrackerEdit {
      * Returns the singleton instance of ServerLoadTracker.
      * @return the singleton instance
      */
-    public static synchronized ServerLoadTracker getInstance() {
+    public static ServerLoadTracker getInstance() {
         if (instance == null) {
             instance = new ServerLoadTracker();
         }
@@ -37,21 +37,22 @@ public class ServerLoadTracker implements LoadTrackerEdit {
         checkFileCreation();
     }
 
-    /**
-     * Writes load information for a server to the tracked data.
-     * @param serverPort the port of the server
-     * @param load the load value to be written
-     */
-    public void writeLoadInfo(String serverPort, double load) {
-        fileVarSync.lock();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileVarSync.asyncGet(), true))) {
-            writer.write(serverPort + "=" + load + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            fileVarSync.unlock();
-        }
-    }
+//    /**
+//     * Writes load information for a server to the tracked data.
+//     * @param serverPort the port of the server
+//     * @param load the load value to be written
+//     */
+//    public void writeLoadInfo(String serverPort, double load) {
+//        fileVarSync.lock();
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileVarSync.asyncGet(), true))) {
+//            writer.write(serverPort + "=" + load + "\n");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            fileVarSync.unlock();
+//        }
+////    }
+//
 
     /**
      * Reads the tracked load information from the file.
@@ -96,6 +97,7 @@ public class ServerLoadTracker implements LoadTrackerEdit {
 
     /**
      * Updates the load information for a specific server.
+     *
      * @param serverIdentifier the identifier of the server
      * @param running the number of running processes
      * @param waiting the number of waiting processes
@@ -110,26 +112,24 @@ public class ServerLoadTracker implements LoadTrackerEdit {
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
             String line;
-            boolean serverUpdated = false; // Flag to track if the server's load info has been updated
-            while ((line = reader.readLine()) != null) {
+
+            while ((line = reader.readLine()) != null)
+            {
                 String[] parts = line.split("=");
-                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
-                if (currentServerIdentifier == serverIdentifier) {
+                int currentServerIdentifier = Integer.parseInt( parts[0] );
+
+                if (currentServerIdentifier == serverIdentifier)
+                {
                     writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
-                    serverUpdated = true;
-                } else {
+                }
+                else
+                {
                     writer.write(line + "\n");
                 }
             }
 
-            // If the server's load info was not updated, add a new entry
-            if (!serverUpdated) {
-                writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
-            }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            fileVarSync.unlock();
         }
 
         // Replace the original file with the temporary file
@@ -141,6 +141,8 @@ public class ServerLoadTracker implements LoadTrackerEdit {
         if (!tempFile.renameTo(originalFile)) {
             System.err.println("Failed to rename temporary file.");
         }
+
+        fileVarSync.unlock();
     }
 
     /**
@@ -167,25 +169,28 @@ public class ServerLoadTracker implements LoadTrackerEdit {
      */
     @Override
     public void removeEntry(int serverIdentifier) {
+
+        fileVarSync.lock();
+
         File originalFile = fileVarSync.asyncGet();
         File tempFile = new File(originalFile.getAbsolutePath() + ".temp");
 
-        fileVarSync.lock();
         try (BufferedReader reader = new BufferedReader(new FileReader(originalFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null)
+            {
                 String[] parts = line.split("=");
-                int currentServerIdentifier = Integer.parseInt(parts[0].replaceAll("[^0-9]", ""));
-                if (currentServerIdentifier != serverIdentifier) {
+                int currentServerIdentifier = Integer.parseInt( parts[0] );
+
+                if (currentServerIdentifier != serverIdentifier)
+                {
                     writer.write(line + "\n");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            fileVarSync.unlock();
         }
 
         // Replace the original file with the temporary file
@@ -197,5 +202,71 @@ public class ServerLoadTracker implements LoadTrackerEdit {
         if (!tempFile.renameTo(originalFile)) {
             System.err.println("Failed to rename temporary file.");
         }
+        fileVarSync.unlock();
+    }
+
+    @Override
+    public int getLoad(int serverIdentifier)
+    {
+        fileVarSync.lock();
+
+        try ( BufferedReader reader = new BufferedReader(new FileReader( this.fileVarSync.asyncGet() )) ) {
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] parts = line.split("=");
+
+                if ( Integer.parseInt(parts[0]) == serverIdentifier )
+                {
+                    fileVarSync.unlock();
+                    String[] loads = parts[1].split(",");
+                    return Integer.parseInt( loads[0] ) + Integer.parseInt( loads[1] );
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        fileVarSync.unlock();
+
+        return -1;
+    }
+
+    @Override
+    public int getServerWithLessLoad()
+    {
+        fileVarSync.lock();
+
+        int port = -1;
+        int lowestLoad = -1;
+
+        try ( BufferedReader reader = new BufferedReader(new FileReader( this.fileVarSync.asyncGet() )) ) {
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] parts = line.split("=");
+                String[] loads = parts[1].split(",");
+
+                int load = Integer.parseInt( loads[0] ) + Integer.parseInt( loads[1] );
+
+                if ( load <= lowestLoad || lowestLoad == -1 )
+                {
+                    port = Integer.parseInt(parts[0]);
+                    lowestLoad = load;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        fileVarSync.unlock();
+
+        return port;
     }
 }
