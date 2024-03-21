@@ -29,6 +29,8 @@ class ConfigParserTest {
         Ini mockIni = new Ini();
         mockIni.put("server", "serverAmount", "2");
         mockIni.put("server", "taskPoolSize", "10");
+        mockIni.put("server", "startPort", "8888");
+        mockIni.put("server", "maxServers", "100");
         mockIni.put("image", "columns", "5");
         mockIni.put("image", "rows", "4");
         when(mockIniFileReader.readIniFile("validConfig")).thenReturn(mockIni);
