@@ -1,5 +1,6 @@
 package Network.Client;
 
+import UI.ClientTab;
 import Utils.Events.Enums.EventTypes;
 import Utils.Events.Event;
 import Utils.Events.InterfaceEvents.InterfaceEvent;
@@ -60,7 +61,7 @@ public class ClientHandler implements Observer {
      * @param clientName The name of the client.
      * @param image      The image to be processed.
      */
-    public void createNewClient(ClienTab tab, String clientName , BufferedImage image )
+    public void createNewClient(ClientTab tab, String clientName , BufferedImage image )
     {
         this.clients.lock();
         MasterClient masterClient = new MasterClient( clientName, image, this.config.getRows(), this.config.getColumns(), this.loadTrackerReader, config.getSavePath());
@@ -215,8 +216,8 @@ public class ClientHandler implements Observer {
             {
                 case LOADED_IMAGE -> {
 
-                    if( subject.getClass() == ClienTab.class )
-                        this.createNewClient( (ClienTab) subject, ((LoadedImageEvent)iEvent).getName() , ((LoadedImageEvent)iEvent).getImage() );
+                    if( subject.getClass() == ClientTab.class )
+                        this.createNewClient( (ClientTab) subject, ((LoadedImageEvent)iEvent).getName() , ((LoadedImageEvent)iEvent).getImage() );
                     else
                         throw new InvalidParameterException( "InterfaceEvent " + ((InterfaceEvent)event).getEvent().toString() );
                 }
