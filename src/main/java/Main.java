@@ -38,6 +38,7 @@ public class Main {
     }
 }
 
+
 // BufferedImage sampleImage = ImageReader.readImage("sample.png");
 // //Java Swing stuff
 // JFrame frame = new JFrame ( "pa-distributed-img" );
