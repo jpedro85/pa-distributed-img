@@ -38,6 +38,16 @@ public enum InterfaceEvents {
     /**
      * Event indicating that the interface is closing.
      */
-    CLOSING_INTERFACE
+    CLOSING_INTERFACE,
+
+    /**
+     * Event indicating to add a server.
+     */
+    ADD_SERVER,
+
+    /**
+     * Event indicating to add a server.
+     */
+    REMOVE_SERVER,
 
 }

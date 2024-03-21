@@ -20,7 +20,45 @@ public class Config {
     private int taskPoolSize;
     private int columns;
     private int rows;
+    private int startPort;
+    private int maxServersNumber;
+
+    /**
+     * Sets the configured beginning port;
+     *
+     *  @param maxServersNumber The beginning port.
+     */
+    public void setMaxServersNumber(int maxServersNumber) {
+        this.maxServersNumber = maxServersNumber;
+    }
+
+    /**
+     * Gets the configured the maximum number of servers.
+     */
+    public int getMaxServersNumber() {
+        return maxServersNumber;
+    }
+
     private final String savePath = Paths.get("src","results").toString();
+
+    /**
+     * Sets the configured beginning port;
+     *
+     *  @param beginPort The beginning port.
+     */
+    public void setStartPort(int beginPort) {
+        this.startPort = beginPort;
+    }
+
+    /**
+     * Gets the configured beginning port;
+     *
+     * @return The amount of servers configured.
+     */
+    public int getStartPort() {
+        return startPort;
+    }
+
     /**
      * Gets the configured amount of servers to be used by the system.
      *

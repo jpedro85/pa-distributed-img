@@ -139,6 +139,11 @@ public class Server extends Thread implements Subject {
         this.notify( EventFactory.createServerEvent( String.format("Serve %s is starting", this.getName()), EventTypes.SERVER, ServerStates.STARTING, this.port ));
     }
 
+
+    public int getPort() {
+        return port;
+    }
+
     @Override
     public void addObserver(Observer observer)
     {
@@ -161,6 +166,12 @@ public class Server extends Thread implements Subject {
             observer.update(this, event);
         }
     }
+
+
+
+
+
+
 
 
     /**
