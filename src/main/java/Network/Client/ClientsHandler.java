@@ -34,7 +34,7 @@ import java.util.ArrayList;
  * - Configuration Flexibility: Integrates with configuration settings to adjust parameters such as image segmentation
  *   dimensions and server load tracking, providing customizable options to optimize processing performance.
  */
-public class ClientHandler implements Observer {
+public class ClientsHandler implements Observer {
 
     private final VarSync< ArrayList<MasterClient> > clients;
 
@@ -48,7 +48,7 @@ public class ClientHandler implements Observer {
      * @param config            The configuration for image processing.
      * @param loadTrackerReader The reader for load tracking information.
      */
-    public ClientHandler(Config config,LoadTrackerReader loadTrackerReader)
+    public ClientsHandler(Config config, LoadTrackerReader loadTrackerReader)
     {
         this.clients = new VarSync< ArrayList<MasterClient> >( new ArrayList<MasterClient>(1) );
         this.config = config;
