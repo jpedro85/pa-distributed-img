@@ -1,5 +1,4 @@
 package UI;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,20 +9,34 @@ import Utils.Observer.Observer;
 import Utils.Observer.Subject;
 import Utils.Events.Event;
 
-public class ClientTab extends JPanel implements Observer, Subject{
+/**
+ * The ClientTab class represents a tab for managing client-related actions.
+ * It allows users to browse and display images, and perform actions related to the displayed image.
+ * This class also implements the Observer and Subject interfaces for observing and notifying events.
+ */
+public class ClientTab extends JPanel implements Observer, Subject {
 
-    private JTabbedPane tabbedPane;
-    private JLabel imageLabel;
+    private JTabbedPane tabbedPane; // Reference to the parent tabbed pane
+    private JLabel imageLabel; // Label for displaying the image
 
+    /**
+     * Constructs a ClientTab object.
+     *
+     * @param tabbedPane The parent JTabbedPane where the tab will be added.
+     */
     public ClientTab(JTabbedPane tabbedPane) {
         this.tabbedPane = tabbedPane;
         initComponents();
     }
 
+    /**
+     * Initializes the components of the ClientTab.
+     * This method sets up the layout and adds components such as image label and buttons.
+     */
     private void initComponents() {
         setLayout(new BorderLayout());
         imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(SwingConstants.CENTER); // Centraliza a imagem na JLabel
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the image in the JLabel
         add(imageLabel, BorderLayout.CENTER);
         JButton closeButton = new JButton("Close Tab");
         add(closeButton, BorderLayout.NORTH);
@@ -34,10 +47,36 @@ public class ClientTab extends JPanel implements Observer, Subject{
                 closeTab();
             }
         });
-        // Botão "Start" para iniciar uma ação relacionada à imagem
-        JButton startButton = new JButton("Start");
 
+        // Button "Start" to perform an action related to the image
+        JButton startButton = new JButton("Start");
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startButtonActionPerformed();
+            }
+        });
+
+        // Browse button to select an image
+        JButton browseButton = new JButton("Browse");
+        browseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                browseButtonActionPerformed();
+            }
+        });
+
+        // Panel to contain the buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(browseButton);
+        buttonPanel.add(startButton);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
+
+    /**
+     * Performs the action when the "Browse" button is clicked.
+     * It allows the user to select an image file and displays it in the image label.
+     */
     public void browseButtonActionPerformed() {
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png");
@@ -49,48 +88,28 @@ public class ClientTab extends JPanel implements Observer, Subject{
             Image image = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
             icon = new ImageIcon(image);
 
-            // Define a imagem na JLabel
+            // Set the image in the JLabel
             imageLabel.setIcon(icon);
-            // Cria o botão "Start"
-            JButton startButton = new JButton("Start");
-            startButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Lógica para a ação "Start" aqui
-                }
-            });
-
-            // Painel para conter o botão "Start"
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            buttonPanel.add(startButton);
-            add(buttonPanel, BorderLayout.SOUTH);
         }
     }
 
-    private JLabel getImageLabel() {
-        if (getComponentCount() > 0) {
-            Component component = getComponent(0);
-            if (component instanceof JPanel) {
-                JPanel panel = (JPanel) component;
-                if (panel.getComponentCount() > 0) {
-                    Component innerComponent = panel.getComponent(0);
-                    if (innerComponent instanceof JLabel) {
-                        return (JLabel) innerComponent;
-                    }
-                }
-            }
-        }
-        return null;
-    }
+    /**
+     * Closes the current tab.
+     */
     private void closeTab() {
         int tabIndex = tabbedPane.indexOfComponent(this);
         if (tabIndex != -1) {
             tabbedPane.removeTabAt(tabIndex);
         }
     }
+
+    /**
+     * Performs the action when the "Start" button is clicked.
+     * Implement the desired action here.
+     */
     private void startButtonActionPerformed() {
-        // Lógica para a ação do botão "Start"
-        // Implemente aqui o que deseja fazer ao clicar no botão "Start"
+        // Logic for the "Start" button action
+        // Implement what you want to do when the "Start" button is clicked
     }
 
     @Override

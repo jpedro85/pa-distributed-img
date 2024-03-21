@@ -1,18 +1,32 @@
 package UI;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
+/**
+ * The MainForm class represents the main user interface panel for managing servers and clients.
+ * It consists of a tabbed pane for managing client tabs, a menu panel on the left containing
+ * buttons for server management, a server information text area, and a table displaying server
+ * status. This class provides functionalities for adding/removing servers, starting all servers,
+ * browsing in client tabs, and updating the total count of servers.
+ */
 public class MainForm extends JPanel {
-    private JTabbedPane tabbedPane;
-    private JTextArea serverInfoTextArea;
-    private JLabel totalServersLabel;
+    private JTabbedPane tabbedPane; // Tabbed pane for managing client tabs
+    private JTextArea serverInfoTextArea; // Text area for displaying server information
+    private JLabel totalServersLabel; // Label for displaying the total count of servers
 
+    /**
+     * Constructs a MainForm object by initializing its components.
+     */
     public MainForm() {
         initComponents();
     }
 
+    /**
+     * Initializes the components of the MainForm.
+     * This method sets up the layout, adds components to the MainForm,
+     * attaches action listeners to buttons, and initializes the default tab.
+     */
     private void initComponents() {
         // Component initialization
         tabbedPane = new JTabbedPane();
@@ -46,7 +60,7 @@ public class MainForm extends JPanel {
         startAllButton.setMinimumSize(new Dimension(150, 30));
         browseButton.setMinimumSize(new Dimension(150, 30));
 
-        // Add action listeners to buttons (you can customize these as needed)
+        // Add action listeners to buttons
         addServerButton.addActionListener(e -> {
             // Add Server logic here
         });
@@ -62,7 +76,7 @@ public class MainForm extends JPanel {
         browseButton.addActionListener(e -> browseActionPerformed());
 
         // Create server info text area
-        serverInfoTextArea = new JTextArea(5, 20); // 5 rows, 20 columns
+        serverInfoTextArea = new JTextArea(5, 20);
         serverInfoTextArea.setEditable(false); // Make it read-only
         JScrollPane scrollPane = new JScrollPane(serverInfoTextArea);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -89,8 +103,8 @@ public class MainForm extends JPanel {
 
         // Add buttons and server info text area to menu panel
         menuPanel.add(buttonPanel);
-        menuPanel.add(totalServersLabel); // Add total servers label
-        menuPanel.add(scrollPane); // Add the scroll pane containing the text area
+        menuPanel.add(totalServersLabel);
+        menuPanel.add(scrollPane);
 
         // Add menu panel to the MainForm at the left
         add(menuPanel, BorderLayout.WEST);
@@ -99,20 +113,29 @@ public class MainForm extends JPanel {
         addNewTab(); // Add a default tab
     }
 
-    // Método para adicionar uma nova aba
+    /**
+     * Adds a new client tab to the tabbed pane.
+     */
     private void addNewTab() {
         tabbedPane.addTab("New Client", new ClientTab(tabbedPane));
     }
 
-    // Método para atualizar a contagem total de servidores
+    /**
+     * Updates the total count of servers displayed in the label.
+     *
+     * @param tableModel The table model containing server data.
+     */
     private void updateTotalServersCount(DefaultTableModel tableModel) {
         totalServersLabel.setText("Total Servers: " + tableModel.getRowCount());
     }
 
-    // Método chamado quando o botão "Browse" é clicado
+    /**
+     * Performs the action when the "Browse" button is clicked.
+     * It retrieves the selected client tab and invokes its browse action.
+     */
     private void browseActionPerformed() {
         int selectedTabIndex = tabbedPane.getSelectedIndex();
-        if (selectedTabIndex != -1) { // Verifica se uma aba está selecionada
+        if (selectedTabIndex != -1) { // Check if a tab is selected
             Component selectedComponent = tabbedPane.getComponentAt(selectedTabIndex);
             if (selectedComponent instanceof ClientTab) {
                 ClientTab clientTab = (ClientTab) selectedComponent;
