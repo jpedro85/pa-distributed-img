@@ -72,9 +72,9 @@ public class Request implements Serializable {
         return imageSection;
     }
 
-    public void setImageSection(byte[] imageSection) {
-        this.imageSection = imageSection;
-    }
+//    public void setImageSection(byte[] imageSection) {
+//        this.imageSection = imageSection;
+//    }
 
     @Override
     public String toString ( ) {
