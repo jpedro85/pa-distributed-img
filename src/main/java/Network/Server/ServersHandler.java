@@ -1,8 +1,6 @@
 package Network.Server;
 
-import UI.ClientTab;
 import Utils.Events.Enums.EventTypes;
-import Utils.Events.Enums.InterfaceEvents;
 import Utils.Events.Enums.SeverityLevels;
 import Utils.Events.Event;
 import Utils.Events.InterfaceEvents.InterfaceEvent;
@@ -26,10 +24,10 @@ import java.util.ArrayList;
  */
 public class ServersHandler implements Subject, Observer {
 
-    private final ArrayList<Observer> observers;
-    private final ArrayList<Server> servers;
-    private final Config config;
-    private final LoadTrackerEdit loadTrackerEdit;
+    private final ArrayList<Observer> OBSERVERS;
+    private final ArrayList<Server> SERVERS;
+    private final Config CONFIG;
+    private final LoadTrackerEdit LOADTRACKEREDIT;
     private final VarSync<Integer> nextAvailablePort ;
 
     /**
@@ -40,11 +38,19 @@ public class ServersHandler implements Subject, Observer {
      */
     public ServersHandler( Config config, LoadTrackerEdit loadTrackerEdit)
     {
-        this.observers = new ArrayList<Observer>();
-        this.servers = new ArrayList<Server>();
-        this.config = config;
-        this.loadTrackerEdit = loadTrackerEdit;
-        this.nextAvailablePort = new VarSync<>( this.config.getStartPort() );
+        this.OBSERVERS = new ArrayList<Observer>();
+        this.SERVERS = new ArrayList<Server>();
+        this.CONFIG = config;
+        this.LOADTRACKEREDIT = loadTrackerEdit;
+        this.nextAvailablePort = new VarSync<>( this.CONFIG.getStartPort() );
+
+        startConfigServer();
+    }
+
+    private void startConfigServer(){
+        for (int i = 0; i < this.CONFIG.getServerAmount() ; i++) {
+            this.addServer( "Server " + i);
+        }
     }
 
     /**
@@ -55,11 +61,14 @@ public class ServersHandler implements Subject, Observer {
     public void addServer(String serverName)
     {
         this.nextAvailablePort.lock();
-        if ( this.config.getStartPort() - ( this.nextAvailablePort.asyncGet() + 1 ) >= 0 )
+        if ( ( this.nextAvailablePort.asyncGet() ) - this.CONFIG.getStartPort() >= 0 )
         {
-            Server newServer = new Server( serverName, this.nextAvailablePort.asyncGet(), config.getTaskPoolSize(), loadTrackerEdit);
-            this.servers.add( newServer );
+            Server newServer = new Server( serverName, this.nextAvailablePort.asyncGet(), CONFIG.getTaskPoolSize(), LOADTRACKEREDIT);
+            this.SERVERS.add( newServer );
+            newServer.addObserver(this);
             newServer.start();
+            this.nextAvailablePort.asyncSet( this.nextAvailablePort.asyncGet() + 1 );
+
 
             this.nextAvailablePort.unlock();
 
@@ -69,7 +78,7 @@ public class ServersHandler implements Subject, Observer {
 
         this.notify(
                 EventFactory.createErrorEvent( String.format("Cannot add a new server max servers numbers reached. %d ",
-                this.config.getMaxServersNumber() ),EventTypes.ERROR, SeverityLevels.ERROR )
+                this.CONFIG.getMaxServersNumber() ),EventTypes.ERROR, SeverityLevels.ERROR )
         );
 
     }
@@ -80,24 +89,28 @@ public class ServersHandler implements Subject, Observer {
     public void removeLastServer()
     {
         this.nextAvailablePort.lock();
-        if (this.servers.size() -1 >= config.getServerAmount() )
+        if (this.SERVERS.size() -1 >= CONFIG.getServerAmount() )
         {
-            Server serverToRemove = this.servers.remove(this.servers.size()-1);
+            Server serverToRemove = this.SERVERS.remove(this.SERVERS.size()-1);
             serverToRemove.close();
+            serverToRemove.removeObserver(this);
             this.nextAvailablePort.asyncSet( serverToRemove.getPort() );
             this.nextAvailablePort.unlock();
         }
         else{
             this.nextAvailablePort.unlock();
-            this.notify( EventFactory.createErrorEvent( String.format( "Cannot remove more servers config minium is %d", this.config.getServerAmount() ), EventTypes.ERROR, SeverityLevels.WARNING ) );
+            this.notify(
+                    EventFactory.createErrorEvent( String.format( "Cannot remove more servers config minimum is %d", this.CONFIG.getServerAmount() ),
+                            EventTypes.ERROR, SeverityLevels.WARNING )
+            );
         }
 
     }
 
     public void addObserver(Observer observer) {
 
-        if ( !this.observers.contains(observer) )
-            this.observers.add(observer);
+        if ( !this.OBSERVERS.contains(observer) )
+            this.OBSERVERS.add(observer);
     }
 
     /**
@@ -105,22 +118,34 @@ public class ServersHandler implements Subject, Observer {
      */
     public void closeAllServers()
     {
-        for ( Server server : this.servers)
+        for ( Server server : this.SERVERS)
         {
             server.close();
         }
     }
 
+    /**
+     * @return The number of current servers
+     */
+    public int getNUmberOfSevers() {
+
+        int size;
+        this.nextAvailablePort.lock();
+        size = SERVERS.size();
+        nextAvailablePort.unlock();
+        return size;
+    }
+
     @Override
     public void removeObserver(Observer observer)
     {
-        this.observers.remove(observer);
+        this.OBSERVERS.remove(observer);
     }
 
     @Override
     public void notify(Event event)
     {
-        for ( Observer observer : this.observers )
+        for ( Observer observer : this.OBSERVERS)
         {
             observer.update(this, event);
         }

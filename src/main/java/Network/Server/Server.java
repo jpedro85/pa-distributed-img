@@ -34,27 +34,28 @@ import java.util.ArrayList;
  */
 public class Server extends Thread implements Subject {
 
-    private final ArrayList<Observer> observers;
-    private final int port;
-    private final TaskPool taskPool;
-    private final VarSync<Boolean> isOpen;
+    private final ArrayList<Observer> OBSERVERS;
+    private final int PORT;
+    private final TaskPool TASK_POOL;
+    private VarSync<Boolean> isOpen;
     private ServerSocket socket;
     private LoadTrackerEdit loadTrackerEdit;
 
     /**
      * Constructs a new Server instance.
      *
-     * @param port            The port number on which the server will listen for incoming connections.
+     * @param PORT            The port number on which the server will listen for incoming connections.
      * @param capacity        The capacity of the task pool for managing client connections.
      * @param loadTrackerEdit The load tracker for monitoring server load.
      */
-    public Server (String name, int port, int capacity, LoadTrackerEdit loadTrackerEdit)
+    public Server (String name, int PORT, int capacity, LoadTrackerEdit loadTrackerEdit)
     {
         this.setName( name );
-        this.port = port;
-        this.taskPool = new TaskPool( capacity );
+        this.PORT = PORT;
+        this.TASK_POOL = new TaskPool( capacity );
         this.isOpen = new VarSync<Boolean>(false);
-        this.observers = new ArrayList<>();
+        this.OBSERVERS = new ArrayList<>();
+        this.loadTrackerEdit = loadTrackerEdit;
     }
 
     /**
@@ -68,10 +69,14 @@ public class Server extends Thread implements Subject {
         {
             this.isOpen.asyncSet(true);
             this.isOpen.unlock();
-            this.loadTrackerEdit.addEntry(this.port, 0, 0);
+            this.loadTrackerEdit.addEntry(this.PORT, 0, 0);
+
+            this.startServer();
             super.start();
+        }else{
+            System.out.println("merda");
+            this.isOpen.unlock();
         }
-        this.isOpen.unlock();
     }
 
     /**
@@ -82,20 +87,22 @@ public class Server extends Thread implements Subject {
     {
         try
         {
-            this.startServer ( );
+            this.notify( EventFactory.createServerEvent( String.format("Serve %s is Running", this.getName()), EventTypes.SERVER, ServerStates.RUNNING, this.PORT));
 
-            this.notify( EventFactory.createServerEvent( String.format("Serve %s is Running", this.getName()), EventTypes.SERVER, ServerStates.RUNNING, this.port ));
-
-            while(true)
+            while( this.isOpen.syncGet() )
             {
                 Socket clientSocket = this.socket.accept ( );
-                this.taskPool.addTask( new ServerClientHandler ( clientSocket, this ) );
-                this.loadTrackerEdit.update(this.port, this.taskPool.getNumberOfRunningTasks(), this.taskPool.getNumberOfWaitingTasks());
+                this.TASK_POOL.addTask( new ServerClientHandler ( clientSocket, this ) );
+                this.loadTrackerEdit.update(this.PORT, this.TASK_POOL.getNumberOfRunningTasks(), this.TASK_POOL.getNumberOfWaitingTasks());
             }
 
-        } catch ( Exception e )
+        }
+        catch ( Exception e )
         {
-            this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
+            //always one exception is raised when server is closing Socket closed
+            if ( ! e.getMessage().equals( "Socket closed" ) ){
+                this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
+            }
         }
     }
 
@@ -108,20 +115,22 @@ public class Server extends Thread implements Subject {
         if ( this.isOpen.asyncGet() )
         {
             this.isOpen.asyncSet(false);
-            this.taskPool.pause();
+            this.TASK_POOL.pause();
 
 
             // finish the current running task
-            while ( !this.taskPool.isPaused() );
+            while ( !this.TASK_POOL.isPaused() );
 
             try
             {
                 this.socket.close();
             }
-            catch (IOException e) {} ;
+            catch (IOException e) {
+                this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
+            } ;
 
-            this.loadTrackerEdit.removeEntry(this.port);
-            this.notify( EventFactory.createServerEvent( String.format("Serve %s is CLOSED", this.getName()), EventTypes.SERVER, ServerStates.CLOSED, this.port ));
+            this.loadTrackerEdit.removeEntry(this.PORT);
+            this.notify( EventFactory.createServerEvent( String.format("Serve %s is CLOSED", this.getName()), EventTypes.SERVER, ServerStates.CLOSED, this.PORT));
         }
         this.isOpen.unlock();
     }
@@ -131,37 +140,71 @@ public class Server extends Thread implements Subject {
      *
      * @throws IOException If an I/O error occurs when opening the socket.
      */
-    private void startServer ( ) throws IOException {
+    private void startServer ( )
+    {
+        try
+        {
+            if ( this.socket != null )
+                this.socket.close();
 
-        this.socket = new ServerSocket ( port );
-        this.taskPool.start();
+            this.socket = new ServerSocket (PORT);
 
-        this.notify( EventFactory.createServerEvent( String.format("Serve %s is starting", this.getName()), EventTypes.SERVER, ServerStates.STARTING, this.port ));
+            this.TASK_POOL.start();
+
+        } catch (IOException e) {
+            this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
+        }
+
+        this.notify( EventFactory.createServerEvent( String.format("Serve %s is starting", this.getName()), EventTypes.SERVER, ServerStates.STARTING, this.PORT));
     }
 
 
+    /**
+     * @return port.
+     */
     public int getPort() {
-        return port;
+        return this.PORT;
+    }
+
+    /**
+     * @return Number of executors.
+     */
+    public int getCapacity(){
+        return this.TASK_POOL.getSize();
+    }
+
+    /**
+     * Removes one executor to the taskPool.
+     */
+    public void addExecutor(){
+        this.TASK_POOL.addExecutors(1);
+    }
+
+    /**
+     * Removes one executor from the taskPool.
+     */
+    public void removeExecutor(){
+        this.TASK_POOL.removeExecutors(1);
     }
 
     @Override
     public void addObserver(Observer observer)
     {
-        if ( !this.observers.contains(observer) )
-            this.observers.add(observer);
+        if ( !this.OBSERVERS.contains(observer) )
+            this.OBSERVERS.add(observer);
 
     }
 
     @Override
     public void removeObserver(Observer observer)
     {
-        this.observers.remove(observer);
+        this.OBSERVERS.remove(observer);
     }
 
     @Override
     public void notify(Event event)
     {
-        for ( Observer observer : this.observers )
+        for ( Observer observer : this.OBSERVERS)
         {
             observer.update(this, event);
         }
@@ -238,7 +281,7 @@ public class Server extends Thread implements Subject {
             BufferedImage editedImage = ImageTransformer.convertToGrayScale( ImageTransformer.createImageFromBytes(request.getImageSection()) );
             Response response = new Response ( "OK" , request.getMessageContent() ,editedImage);
 
-            server.loadTrackerEdit.update(server.port, server.taskPool.getNumberOfRunningTasks(), server.taskPool.getNumberOfWaitingTasks());
+            server.loadTrackerEdit.update(server.PORT, server.TASK_POOL.getNumberOfRunningTasks(), server.TASK_POOL.getNumberOfWaitingTasks());
 
             return response;
         }

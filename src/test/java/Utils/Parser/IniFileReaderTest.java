@@ -80,6 +80,7 @@ class IniFileReaderTest {
         IniFileReader firstInstance = IniFileReader.getInstance();
         IniFileReader secondInstance = IniFileReader.getInstance();
         assertSame(firstInstance, secondInstance, "IniFileReader should return the same instance.");
+
     }
 
     @Test
@@ -99,11 +100,7 @@ class IniFileReaderTest {
         service.awaitTermination(1, TimeUnit.MINUTES);
 
         assertEquals(1, instances.size(), "Multiple instances were created in a multithreaded environment.");
+
     }
 
-    @AfterAll
-    public void tearDown() throws IOException {
-        configFile.delete();
-        Files.deleteIfExists(Paths.get("invalidFormat.ini"));
-    }
 }

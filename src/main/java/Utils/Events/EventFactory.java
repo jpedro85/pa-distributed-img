@@ -179,7 +179,7 @@ public class EventFactory {
         if ( events != InterfaceEvents.START_ALL && events != InterfaceEvents.CANCEL_ALL )
             throw new IllegalArgumentException("Event needs to be one of {START_ALL,CANCEL_ALL}.");
 
-        if (eventType != EventTypes.IMAGE)
+        if (eventType != EventTypes.INTERFACE)
             throw new IllegalArgumentException("The type of event is not valid for this Event.");
 
         return new InterfaceEventWithNames( eventType, events, message, names );
@@ -203,10 +203,12 @@ public class EventFactory {
         if ( name == null || name.trim().isEmpty() )
             throw new IllegalArgumentException("Name must not be null or empty.");
 
-        if ( events != InterfaceEvents.START && events != InterfaceEvents.CANCEL && events != InterfaceEvents.UNLOADED_IMAGE )
-            throw new IllegalArgumentException("Event needs to be one of {START,CANCEL,UNLOADED_IMAGE}.");
+        if ( events != InterfaceEvents.START && events != InterfaceEvents.CANCEL && events != InterfaceEvents.UNLOADED_IMAGE
+                && events != InterfaceEvents.ADD_SERVER && events != InterfaceEvents.REMOVE_SERVER && events != InterfaceEvents.CLOSING_INTERFACE
+        )
+            throw new IllegalArgumentException("Event needs to be one of {START,CANCEL,UNLOADED_IMAGE,ADD_SERVER,REMOVE_SERVER}.");
 
-        if ( eventType != EventTypes.IMAGE )
+        if ( eventType != EventTypes.INTERFACE )
             throw new IllegalArgumentException("The type of event is not valid for this Event.");
 
         return new InterfaceEventWithName( eventType, events, message, name );
