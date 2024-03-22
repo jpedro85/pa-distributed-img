@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class ImageSaverTest {
@@ -33,6 +34,7 @@ class ImageSaverTest {
     }
 
     @Test
+    @DisplayName("Testing save on valid path")
     public void saveImage_ValidImageAndPath_ReturnsTrue() {
 
         boolean result = ImageSaver.saveImage(testImage, format, testImagePath);
@@ -41,6 +43,7 @@ class ImageSaverTest {
     }
 
     @Test
+    @DisplayName("Testing save on invalid path")
     public void saveImage_InvalidPath_ReturnsFalse() {
 
         String filePath = "/invalid/path/test_image.png";
