@@ -24,8 +24,7 @@ public class ServerHandlerTest {
     private LoadTrackerEdit loadTrackerEdit;
     private MockObserver mockObserver;
 
-    void creatConfig()
-    {
+    void creatConfig() {
         config = new Config();
         config.setMaxServersNumber(3);
         config.setStartPort(49165);
@@ -36,8 +35,7 @@ public class ServerHandlerTest {
     }
 
     @BeforeEach
-    void setUp()
-    {
+    void setUp() {
         creatConfig();
         loadTrackerEdit = ServerLoadTracker.getInstance();
         ServerLoadTracker.getInstance().setFilePath("load_infoTestHandler.temp");
@@ -49,7 +47,7 @@ public class ServerHandlerTest {
     }
 
     @AfterEach
-    void clearObserver(){
+    void clearObserver() {
         mockObserver.getEvents().clear();
         serversHandler.closeAllServers();
     }
@@ -63,20 +61,26 @@ public class ServerHandlerTest {
 
     @Test
     @DisplayName("Testing remove server")
-    void testRemoveLastServer() {
+    void testRemoveLastServer() throws InterruptedException {
+
+        Thread.sleep(1000); // Adjust time as necessary for your environment
 
         serversHandler.removeLastServer();
 
-        for (Event e : mockObserver.getEvents()){
+        Thread.sleep(500); // Adjust time as necessary for your environment
+
+        for (Event e : mockObserver.getEvents()) {
             if (e.getType() == EventTypes.ERROR)
                 assertEquals("Cannot remove more servers config minimum is 2", e.getMessage());
         }
 
         serversHandler.addServer("TestServer2");
+        Thread.sleep(500); // Adjust time as necessary for your environment
         assertEquals(3, serversHandler.getNUmberOfSevers());
 
         serversHandler.removeLastServer();
-        assertEquals( 2 , this.serversHandler.getNUmberOfSevers() );
+        Thread.sleep(500); // Adjust time as necessary for your environment
+        assertEquals(2, this.serversHandler.getNUmberOfSevers());
 
     }
 
@@ -86,43 +90,47 @@ public class ServerHandlerTest {
         serversHandler.closeAllServers();
 
         int closedCount = 0;
-        for (Event event: mockObserver.getEvents()){
+        for (Event event : mockObserver.getEvents()) {
 
-            if( event.getMessage().equals("Serve Server 0 is CLOSED") || event.getMessage().equals("Serve Server 1 is CLOSED") )
+            if (event.getMessage().equals("Serve Server 0 is CLOSED")
+                    || event.getMessage().equals("Serve Server 1 is CLOSED"))
                 closedCount++;
         }
 
-        assertEquals(2,closedCount);
+        assertEquals(2, closedCount);
     }
 
     @Test
     @DisplayName("testing notification")
     void testNotify() {
         this.serversHandler.addServer("B");
-        assertFalse( mockObserver.getEvents().isEmpty());
+        assertFalse(mockObserver.getEvents().isEmpty());
     }
 
     @Test
     @DisplayName("testing update")
-    void testUpdate()
-    {
+    void testUpdate() {
 
-        MockSubject subject =new MockSubject();
+        MockSubject subject = new MockSubject();
         subject.addObserver(serversHandler);
 
-        subject.notify( EventFactory.createInterfaceEventWithName( "add new server",EventTypes.INTERFACE,InterfaceEvents.ADD_SERVER,"Server ADD1" ));
+        subject.notify(EventFactory.createInterfaceEventWithName("add new server", EventTypes.INTERFACE,
+                InterfaceEvents.ADD_SERVER, "Server ADD1"));
         assertEquals(3, serversHandler.getNUmberOfSevers());
 
-        subject.notify( EventFactory.createInterfaceEventWithName( "add new server",EventTypes.INTERFACE,InterfaceEvents.REMOVE_SERVER,"a" ));
+        subject.notify(EventFactory.createInterfaceEventWithName("add new server", EventTypes.INTERFACE,
+                InterfaceEvents.REMOVE_SERVER, "a"));
         assertEquals(2, serversHandler.getNUmberOfSevers());
 
-        subject.notify( EventFactory.createInterfaceEventWithName( "add new server",EventTypes.INTERFACE,InterfaceEvents.CLOSING_INTERFACE,"a" ));
+        subject.notify(EventFactory.createInterfaceEventWithName("add new server", EventTypes.INTERFACE,
+                InterfaceEvents.CLOSING_INTERFACE, "a"));
         assertEquals(2, serversHandler.getNUmberOfSevers());
 
         int closedCount = 0;
-        for (Event event: mockObserver.getEvents()){
+        for (Event event : mockObserver.getEvents()) {
 
-            if( event.getMessage().equals("Serve Server 0 is CLOSED") || event.getMessage().equals("Serve Server 1 is CLOSED") )
+            if (event.getMessage().equals("Serve Server 0 is CLOSED")
+                    || event.getMessage().equals("Serve Server 1 is CLOSED"))
                 closedCount++;
         }
 
@@ -131,7 +139,6 @@ public class ServerHandlerTest {
     @AfterAll
     static void cleanUp() throws IOException {
 
-        Files.delete( Paths.get("load_infoTestHandler.temp") );
+        Files.delete(Paths.get("load_infoTestHandler.temp"));
     }
 }
-
