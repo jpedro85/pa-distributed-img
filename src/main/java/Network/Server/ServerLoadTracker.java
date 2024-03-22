@@ -8,13 +8,13 @@ import Utils.VarSync;
  */
 public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
     private static ServerLoadTracker instance;
-    private final VarSync<File> fileVarSync;
+    private final VarSync<File> FILE_VARSYNC;
 
     /**
      * Private constructor to prevent instantiation from outside the class.
      */
     private ServerLoadTracker() {
-        this.fileVarSync = new VarSync<>(null);
+        FILE_VARSYNC = new VarSync<>(null);
     }
 
     /**
@@ -33,8 +33,10 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
      * @param path the file path
      */
     public void setFilePath(String path) {
-        fileVarSync.syncSet(new File(path));
+        FILE_VARSYNC.lock();
+        FILE_VARSYNC.asyncSet(new File(path));
         checkFileCreation();
+        FILE_VARSYNC.unlock();
     }
 
 //    /**
@@ -60,8 +62,8 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
      */
     public synchronized String readLoadInfo() {
         StringBuilder loadInfoBuilder = new StringBuilder();
-        fileVarSync.lock();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileVarSync.asyncGet()))) {
+        FILE_VARSYNC.lock();
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_VARSYNC.asyncGet()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 loadInfoBuilder.append(line).append("\n");
@@ -69,7 +71,7 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            fileVarSync.unlock();
+            FILE_VARSYNC.unlock();
         }
         return loadInfoBuilder.toString();
     }
@@ -78,7 +80,8 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
      * Checks if the file is created and prints a message.
      */
     private void checkFileCreation() {
-        File file = fileVarSync.asyncGet();
+
+        File file = FILE_VARSYNC.asyncGet();
         if (file.exists()) {
             System.out.println("File already exists: " + file.getAbsolutePath());
         } else {
@@ -104,10 +107,12 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
      */
     @Override
     public void update(int serverIdentifier, int running, int waiting) {
-        File originalFile = fileVarSync.asyncGet();
+
+        FILE_VARSYNC.lock();
+
+        File originalFile = FILE_VARSYNC.asyncGet();
         File tempFile = new File(originalFile.getAbsolutePath() + ".temp");
 
-        fileVarSync.lock();
         try (BufferedReader reader = new BufferedReader(new FileReader(originalFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 
@@ -142,7 +147,7 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
             System.err.println("Failed to rename temporary file.");
         }
 
-        fileVarSync.unlock();
+        FILE_VARSYNC.unlock();
     }
 
     /**
@@ -153,13 +158,13 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
      */
     @Override
     public void addEntry(int serverIdentifier, int running, int waiting) {
-        fileVarSync.lock();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileVarSync.asyncGet(), true))) {
+        FILE_VARSYNC.lock();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_VARSYNC.asyncGet(), true))) {
             writer.write(serverIdentifier + "=" + running + "," + waiting + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            fileVarSync.unlock();
+            FILE_VARSYNC.unlock();
         }
     }
 
@@ -170,9 +175,9 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
     @Override
     public void removeEntry(int serverIdentifier) {
 
-        fileVarSync.lock();
+        FILE_VARSYNC.lock();
 
-        File originalFile = fileVarSync.asyncGet();
+        File originalFile = FILE_VARSYNC.asyncGet();
         File tempFile = new File(originalFile.getAbsolutePath() + ".temp");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(originalFile));
@@ -202,15 +207,15 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
         if (!tempFile.renameTo(originalFile)) {
             System.err.println("Failed to rename temporary file.");
         }
-        fileVarSync.unlock();
+        FILE_VARSYNC.unlock();
     }
 
     @Override
     public int getLoad(int serverIdentifier)
     {
-        fileVarSync.lock();
+        FILE_VARSYNC.lock();
 
-        try ( BufferedReader reader = new BufferedReader(new FileReader( this.fileVarSync.asyncGet() )) ) {
+        try ( BufferedReader reader = new BufferedReader(new FileReader( FILE_VARSYNC.asyncGet() )) ) {
 
             String line;
 
@@ -220,7 +225,7 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
 
                 if ( Integer.parseInt(parts[0]) == serverIdentifier )
                 {
-                    fileVarSync.unlock();
+                    FILE_VARSYNC.unlock();
                     String[] loads = parts[1].split(",");
                     return Integer.parseInt( loads[0] ) + Integer.parseInt( loads[1] );
                 }
@@ -230,7 +235,7 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
             e.printStackTrace();
         }
 
-        fileVarSync.unlock();
+        FILE_VARSYNC.unlock();
 
         return -1;
     }
@@ -238,12 +243,12 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
     @Override
     public int getServerWithLessLoad()
     {
-        fileVarSync.lock();
+        FILE_VARSYNC.lock();
 
         int port = -1;
         int lowestLoad = -1;
 
-        try ( BufferedReader reader = new BufferedReader(new FileReader( this.fileVarSync.asyncGet() )) ) {
+        try ( BufferedReader reader = new BufferedReader(new FileReader( FILE_VARSYNC.asyncGet() )) ) {
 
             String line;
 
@@ -265,7 +270,7 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
             e.printStackTrace();
         }
 
-        fileVarSync.unlock();
+        FILE_VARSYNC.unlock();
 
         return port;
     }
