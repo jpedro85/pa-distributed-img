@@ -80,6 +80,30 @@ public class Server extends Thread implements Subject {
     }
 
     /**
+     * Initializes the server socket and the TaskPool.
+     *
+     * @throws IOException If an I/O error occurs when opening the socket.
+     */
+    private void startServer ( )
+    {
+        try
+        {
+            if ( this.socket != null )
+                this.socket.close();
+
+            this.socket = new ServerSocket (PORT);
+
+            this.TASK_POOL.start();
+
+        } catch (IOException e) {
+            this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
+            System.out.println("Não criou um sockec :" + e.getMessage());
+        }
+
+        this.notify( EventFactory.createServerEvent( String.format("Serve %s is starting", this.getName()), EventTypes.SERVER, ServerStates.STARTING, this.PORT));
+    }
+
+    /**
      * The entry point of the server thread. Starts the server to accept and handle client connections.
      */
     @Override
@@ -131,30 +155,6 @@ public class Server extends Thread implements Subject {
         }
         this.isOpen.unlock();
     }
-
-    /**
-     * Initializes the server socket and the TaskPool.
-     *
-     * @throws IOException If an I/O error occurs when opening the socket.
-     */
-    private void startServer ( )
-    {
-        try
-        {
-            if ( this.socket != null )
-                this.socket.close();
-
-            this.socket = new ServerSocket (PORT);
-
-            this.TASK_POOL.start();
-
-        } catch (IOException e) {
-            this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
-        }
-
-        this.notify( EventFactory.createServerEvent( String.format("Serve %s is starting", this.getName()), EventTypes.SERVER, ServerStates.STARTING, this.PORT));
-    }
-
 
     /**
      * @return port.

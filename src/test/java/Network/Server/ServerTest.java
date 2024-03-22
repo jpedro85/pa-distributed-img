@@ -8,24 +8,35 @@ import Utils.Events.Event;
 import Utils.Events.ServerEvent;
 import org.junit.jupiter.api.*;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServerTest {
 
-
     private Server server;
-    private LoadTrackerEdit loadTraker;
-    private LoadTrackerReader loadTrakerReader;
+    private static LoadTrackerEdit loadTraker;
+    private static LoadTrackerReader loadTrakerReader;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp()
+    {
+        server = new Server("TestServer", 20000, 3, loadTraker);
+    }
 
+    @BeforeAll
+    static void startUp(){
         loadTraker = ServerLoadTracker.getInstance();
         loadTrakerReader = ServerLoadTracker.getInstance();
         ServerLoadTracker.getInstance().setFilePath("load_info2.temp");
-        server = new Server("TestServer", 20000, 3, loadTraker);
+    }
+
+    @AfterAll
+    static void cleanUp() throws IOException {
+
+        Files.delete( Paths.get("load_info2.temp") );
     }
 
     @Test

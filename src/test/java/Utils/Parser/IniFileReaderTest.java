@@ -3,6 +3,7 @@ package Utils.Parser;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // Add this annotation
 class IniFileReaderTest {
 
-    private String testFilePath = "testConfig.ini";
+    private static String testFilePath = "testConfig.ini";
     private File configFile;
 
     @BeforeAll
@@ -38,9 +39,10 @@ class IniFileReaderTest {
         testFile.store(configFile);
     }
 
-    @BeforeAll
-    public static void setupInvalidFormatFile() throws IOException {
-        Files.writeString(Paths.get("invalidFormat.ini"), "This is not a valid INI content!");
+    @AfterAll
+    static void cleanUp() throws IOException {
+
+        Files.delete( Paths.get(testFilePath) );
     }
 
     @Test
@@ -69,10 +71,22 @@ class IniFileReaderTest {
 
     @Test
     public void testReadInvalidIniFileFormat() {
+
+        String fileContent = "This is not a valid INI content!";
+
+        try (FileWriter writer = new FileWriter("invalidFormat.ini")) {
+            // Write the content to the file
+            writer.write(fileContent);
+            System.out.println("File created successfully.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating the file: " + e.getMessage());
+        }
+
         IniFileReader reader = IniFileReader.getInstance();
         assertThrows(Exception.class, () -> {
             reader.readIniFile("invalidFormat.ini");
         });
+
     }
 
     @Test
