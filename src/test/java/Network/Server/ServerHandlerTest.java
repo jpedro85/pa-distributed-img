@@ -28,7 +28,7 @@ public class ServerHandlerTest {
     {
         config = new Config();
         config.setMaxServersNumber(3);
-        config.setStartPort(8888);
+        config.setStartPort(49165);
         config.setServerAmount(2);
         config.setColumns(2);
         config.setRows(2);
