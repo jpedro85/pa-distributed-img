@@ -24,8 +24,8 @@ public class ServerTest {
 
         loadTraker = ServerLoadTracker.getInstance();
         loadTrakerReader = ServerLoadTracker.getInstance();
-        ServerLoadTracker.getInstance().setFilePath("load_info.temp");
-        server = new Server("TestServer", 8888, 3, loadTraker);
+        ServerLoadTracker.getInstance().setFilePath("load_info2.temp");
+        server = new Server("TestServer", 20000, 3, loadTraker);
     }
 
     @Test
@@ -34,9 +34,9 @@ public class ServerTest {
     {
         server.start();
 
-        assertEquals( loadTrakerReader.getServerWithLessLoad(), 8888  );
+        assertEquals( loadTrakerReader.getServerWithLessLoad(), 20000  );
 
-        MockClient client = new MockClient("localhost",8888);
+        MockClient client = new MockClient("localhost",20000);
 
         try {
             client.start();
@@ -57,7 +57,7 @@ public class ServerTest {
 
         assertNotNull(server);
         assertEquals("TestServer", server.getName());
-        assertEquals(8888, server.getPort());
+        assertEquals(20000, server.getPort());
         assertEquals(3, server.getCapacity());
 
     }

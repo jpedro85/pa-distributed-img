@@ -6,18 +6,16 @@ import Utils.Events.Enums.EventTypes;
 import Utils.Events.EventFactory;
 import Utils.Events.MockObserver;
 import Utils.Events.MockSubject;
-import Utils.Observer.Observer;
 import Utils.Parser.Config;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class ServerHandlerTest {
 
     private ServersHandler serversHandler;
     private Config config;
-    private LoadTrackerEdit mockLoadTrackerEdit;
+    private LoadTrackerEdit loadTrackerEdit;
     private MockObserver mockObserver;
 
     void creatConfig()
@@ -35,11 +33,19 @@ public class ServerHandlerTest {
     void setUp()
     {
         creatConfig();
-        mockLoadTrackerEdit = mock(LoadTrackerEdit.class);
-        serversHandler = new ServersHandler(config, mockLoadTrackerEdit);
+        loadTrackerEdit = ServerLoadTracker.getInstance();
+        ServerLoadTracker.getInstance().setFilePath("load_infoTestHandler.temp");
+
+        serversHandler = new ServersHandler(config, loadTrackerEdit);
         mockObserver = new MockObserver();
         serversHandler.addObserver(mockObserver);
 
+    }
+
+    @AfterEach
+    void clearObserver(){
+        mockObserver.getEvents().clear();
+        serversHandler.closeAllServers();
     }
 
     @Test
@@ -65,9 +71,11 @@ public class ServerHandlerTest {
 
         serversHandler.removeLastServer();
         assertEquals( 2 , this.serversHandler.getNUmberOfSevers() );
+
     }
 
     @Test
+    @DisplayName("Closing all server")
     void testCloseAllServers() {
         serversHandler.closeAllServers();
 
@@ -82,11 +90,14 @@ public class ServerHandlerTest {
     }
 
     @Test
+    @DisplayName("testing notification")
     void testNotify() {
+        this.serversHandler.addServer("B");
         assertFalse( mockObserver.getEvents().isEmpty());
     }
 
     @Test
+    @DisplayName("testing update")
     void testUpdate()
     {
 

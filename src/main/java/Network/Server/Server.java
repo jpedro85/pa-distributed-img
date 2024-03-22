@@ -96,13 +96,10 @@ public class Server extends Thread implements Subject {
                 this.loadTrackerEdit.update(this.PORT, this.TASK_POOL.getNumberOfRunningTasks(), this.TASK_POOL.getNumberOfWaitingTasks());
             }
 
-        }
+        }catch (IOException e){}
         catch ( Exception e )
         {
-            //always one exception is raised when server is closing Socket closed
-            if ( ! e.getMessage().equals( "Socket closed" ) ){
-                this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
-            }
+            this.notify( EventFactory.createErrorEvent( e.getMessage(), EventTypes.ERROR, SeverityLevels.ERROR ) );
         }
     }
 
