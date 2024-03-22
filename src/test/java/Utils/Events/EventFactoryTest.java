@@ -349,7 +349,7 @@ class EventFactoryTest {
     @DisplayName("Create an InterfaceEventWithNames and validate its properties")
     void testCreateInterfaceEventWithNames_ValidInput() {
         String message = "Test InterfaceEventWithNames";
-        EventTypes type = EventTypes.IMAGE;
+        EventTypes type = EventTypes.INTERFACE;
         InterfaceEvents events = InterfaceEvents.START_ALL;
         String[] names = {"Name1", "Name2", "Name3"};
 
@@ -419,7 +419,7 @@ class EventFactoryTest {
     @DisplayName("Create an InterfaceEventWithName and validate its properties")
     void testCreateInterfaceEventWithName_ValidInput() {
         String message = "Test InterfaceEventWithName";
-        EventTypes type = EventTypes.IMAGE;
+        EventTypes type = EventTypes.INTERFACE;
         InterfaceEvents events = InterfaceEvents.START;
         String name = "Name1";
 
