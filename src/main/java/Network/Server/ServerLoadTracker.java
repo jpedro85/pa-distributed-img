@@ -8,7 +8,7 @@ import Utils.VarSync;
  */
 public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
     private static ServerLoadTracker instance;
-    private final VarSync<File> FILE_VARSYNC;
+    private static VarSync<File> FILE_VARSYNC;
 
     /**
      * Private constructor to prevent instantiation from outside the class.

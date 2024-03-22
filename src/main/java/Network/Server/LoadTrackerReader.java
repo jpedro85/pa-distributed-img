@@ -10,7 +10,7 @@ public interface LoadTrackerReader {
 
     /**
      *
-     * @return server identifier that has the less load
+     * @return server identifier that has the less load. -1 if no server exists.
      */
     public int getServerWithLessLoad();
 
