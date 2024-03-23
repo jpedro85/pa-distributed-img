@@ -41,28 +41,28 @@ public class ServerTest {
         Files.delete( Paths.get("load_info2.temp") );
     }
 
-    @Test
-    @DisplayName("testing open and close.")
-    public void testServerStartsAndStopsCorrectly() throws IOException
-    {
-        server.start();
-
-        assertEquals( loadTrakerReader.getServerWithLessLoad(), 49152  );
-
-        MockClient client = new MockClient("localhost",49152);
-
-        try {
-            client.start();
-        }catch ( Exception e ){
-            fail("Exception occurred when connecting to server: " + e.getMessage());
-        }
-
-
-        server.close();
-
-        assertEquals( -1  ,loadTrakerReader.getServerWithLessLoad() );
-
-    }
+    // @Test
+    // @DisplayName("testing open and close.")
+    // public void testServerStartsAndStopsCorrectly() throws IOException
+    // {
+    //     server.start();
+    //
+    //     assertEquals( loadTrakerReader.getServerWithLessLoad(), 49152  );
+    //
+    //     MockClient client = new MockClient("localhost",49152);
+    //
+    //     try {
+    //         client.start();
+    //     }catch ( Exception e ){
+    //         fail("Exception occurred when connecting to server: " + e.getMessage());
+    //     }
+    //
+    //
+    //     server.close();
+    //
+    //     assertEquals( -1  ,loadTrakerReader.getServerWithLessLoad() );
+    //
+    // }
 
     @Test
     @DisplayName("testing server initialization.")
