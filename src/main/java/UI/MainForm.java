@@ -41,25 +41,33 @@ public class MainForm extends JPanel implements Observer, Subject {
     private JTextPane serversNotfifycations; // Text area for displaying server information
     private JLabel totalServersLabel; // Label for displaying the total count of servers
 
-    private DefaultTableModel tableModel;
+    private DefaultTableModel tableModel; // table for displaying servers info
 
-    private Observer serversHandler;
-    private Observer clientsHandler;
+    private Observer serversHandler; // instance to observe
+    private Observer clientsHandler; // instance to observe
 
+    // Enum to Uniform the styles
     private enum StylesTypes {
         ERROR,
         WARNING,
         NORMAL
     }
 
+    // the config
     private Config config;
 
+    // to keep track of totalServers in this class
     private int totalServers = 0;
 
+    // array to keep track of the Clients that have been poped
     public final VarSync<ArrayList<ClientTab> > poped;
 
     /**
      * Constructs a MainForm object by initializing its components.
+     *
+     * @param serversHandler instance of the serversHandler to send events to
+     * @param clientsHandler instance of the clientsHandler to send events to
+     * @param config the loaded config
      */
     public MainForm(ServersHandler serversHandler, ClientsHandler clientsHandler, Config config)
     {
@@ -205,7 +213,11 @@ public class MainForm extends JPanel implements Observer, Subject {
     }
 
 
-
+    /**
+     * Opens the file browser
+     *
+     * @return File the open file or null if none where selected or are invalid
+     */
     private File browse() {
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png");
@@ -217,7 +229,12 @@ public class MainForm extends JPanel implements Observer, Subject {
             return null;
     }
 
-
+    /**
+     * Notifies clientsHandler that a new image has been loaded and a client tab has been created
+     *
+     * @param file the loaded image
+     * @param tab the client tab to handle that image
+     */
     private void notifyLoadedImage(File file, ClientTab tab)
     {
         ImageReader.readImage(file.getAbsolutePath());
@@ -225,6 +242,9 @@ public class MainForm extends JPanel implements Observer, Subject {
         this.clientsHandler.update( tab, event);
     }
 
+    /**
+     * Notifies clientsHandler to start processing all current loaded images
+     */
     private void notifyStarAll()
     {
 
@@ -256,25 +276,40 @@ public class MainForm extends JPanel implements Observer, Subject {
         poped.unlock();
     }
 
+    /**
+     *  Notifies serversHandler to add a server.
+     */
     private void notifyAddServer()
     {
         Event event = EventFactory.createInterfaceEventWithName("Add new server", EventTypes.INTERFACE, InterfaceEvents.ADD_SERVER, "Server");
         this.serversHandler.update( this, event);
     }
 
+    /**
+     * Notifies serversHandler to remove a server.
+     */
     private void notifyRemoveServer()
     {
         Event event = EventFactory.createInterfaceEventWithName("Remove last server", EventTypes.INTERFACE, InterfaceEvents.REMOVE_SERVER, "Server");
         this.serversHandler.update( this, event);
     }
 
-
+    /**
+     * Notifies clientsHandler to start the client with the specified name.
+     *
+     * @param name the name of the client
+     */
     public void startClient(String name)
     {
         Event event = EventFactory.createInterfaceEventWithName("start", EventTypes.INTERFACE, InterfaceEvents.START, name);
         this.clientsHandler.update( this, event);
     }
 
+    /**
+     * Notifies clientsHandler to cancel the client with the specified name.
+     *
+     * @param name the name of the client
+     */
     public void cancelClient(String name)
     {
         Event event = EventFactory.createInterfaceEventWithName("cancel", EventTypes.INTERFACE, InterfaceEvents.CANCEL, name);
@@ -299,6 +334,11 @@ public class MainForm extends JPanel implements Observer, Subject {
         }
     }
 
+    /**
+     * Handles the received event
+     *
+     * @param event the event to handle
+     */
     private void  updateServerEvents(ServerEvent event)
     {
         try {
@@ -348,6 +388,11 @@ public class MainForm extends JPanel implements Observer, Subject {
         }
     }
 
+    /**
+     * handles the update od server states.
+     *
+     * @param event the event to handle.
+     */
     private void updateLoadServerEvent(LoadUpdateEvent event)
     {
         int row = getIndexOfServer( event.getID() );
@@ -355,7 +400,10 @@ public class MainForm extends JPanel implements Observer, Subject {
         tableModel.setValueAt( event.getRUNNING() , row, 3);
     }
 
-
+    /**
+     * @param id the id of the server
+     * @return the row index corresponding with
+     */
     private int getIndexOfServer(int id) {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             int currentId = (int) tableModel.getValueAt(i, 0) ;
@@ -366,6 +414,10 @@ public class MainForm extends JPanel implements Observer, Subject {
         return -1;
     }
 
+    /**
+     * Handles the error events
+     * @param event the event to handle
+     */
     private void updateHandleErrors(ErrorEvent event){
         try
         {
