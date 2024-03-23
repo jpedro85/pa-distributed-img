@@ -14,13 +14,26 @@ import Utils.Image.*;
 import Utils.Parser.Config;
 import Utils.Parser.ConfigParser;
 
+/**
+ * Main class the beginning of the program
+ */
 public class Main {
 
+    //serverLoadTracker
     private static ServerLoadTracker serverLoadTracker;
+
+    //main window panel
     private static MainForm mainForm;
 
+    //main window
     private static JFrame mainFrame;
 
+    /**
+     * Main the start
+     *
+     * @param args arguments
+     * @throws IOException io exception
+     */
     public static void main(String[] args) throws IOException {
 
         Config config = ConfigParser.getInstance().parseFromIniToConfig("config.ini");
@@ -38,6 +51,13 @@ public class Main {
 
     }
 
+    /**
+     * Creates and prepares to show the UI
+     *
+     * @param serversHandler the server handler instance
+     * @param clientsHandler the clients handler instance
+     * @param config the loaded config rows == columns
+     */
     private static void createAndShowGUI(ServersHandler serversHandler,ClientsHandler clientsHandler,Config config)
     {
         mainFrame = new JFrame("Main Form");
@@ -72,7 +92,9 @@ public class Main {
         mainFrame.pack();
     }
 
-
+    /**
+     *  Initializes Server load Tracker instance with the path
+     */
     private static void intitializeServerLoadTracker()
     {
         serverLoadTracker = ServerLoadTracker.getInstance();
