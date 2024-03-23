@@ -24,37 +24,57 @@ import Utils.Events.Event;
 
 public class ClientTab extends JPanel implements Observer , Subject{
 
-    private JTabbedPane tabbedPane; // Reference to the parent tabbed pane
-    private JLabel imageLabel; // Label for displaying the image
-    private JFrame floatingFrame; // Reference to the floating frame
+    // Reference to the parent tabbed pane
+    private JTabbedPane tabbedPane;
+    // Label for displaying the image
+    private JLabel imageLabel;
 
+    // Reference to the floating frame
+    private JFrame floatingFrame;
+
+    // a text box to show messages
     private JTextPane infoText;
 
+    // the reference to parent
     private MainForm parent;
 
+    //the loaded bufferedImage
     private BufferedImage buferedImage;
 
+    // A enum to standardize the style names
     private enum StylesTypes {
         ERROR,
         WARNING,
         NORMAL
     }
 
+    // icon to show as default in grid
     private ImageIcon defaultIcon;
+
+    // icon to show in state waiting in grid
     private ImageIcon waitingIcon;
+    // processing icon
     private ImageIcon processingIcon;
 
+    // processing image
     private ImageIcon[][] icons;
 
+    // Number of columns
     private int columns;
+
+    // Number of rows
     private int rows;
 
+    // processingImage
     private JPanel processingImage;
 
+    // a panel to divide the interface and merge the two images
     private JPanel midel;
 
+    // reference to the startButton
     public JButton startButton;
 
+    // reference to the closeButton
     private JButton closeButton;
 
     /**
@@ -75,10 +95,14 @@ public class ClientTab extends JPanel implements Observer , Subject{
         this.parent = parent;
     }
 
+    // ratio original W to 3000
     private double w_ratio;
+    // ratio original H to 3000
     private double h_ratio;
 
-
+    /**
+     * Initialize grid
+     */
     private void initIcons(){
 
         w_ratio = buferedImage.getWidth() / 300.0;
@@ -198,6 +222,8 @@ public class ClientTab extends JPanel implements Observer , Subject{
 
         // Button to integrate a floating frame back into a tab
         JButton integrateButton = new JButton("Integrate");
+        integrateButton.setEnabled(false);
+
         popButton.addActionListener( e -> {
 
             SwingUtilities.invokeLater( () -> {
@@ -257,26 +283,12 @@ public class ClientTab extends JPanel implements Observer , Subject{
 
     }
 
-    /**
-     * Performs the action when the "Browse" button is clicked.
-     * It allows the user to select an image file and displays it in the image label.
-     */
-//    public void browseButtonActionPerformed() {
-//        JFileChooser fileChooser = new JFileChooser();
-//        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png");
-//        fileChooser.setFileFilter(filter);
-//        int returnVal = fileChooser.showOpenDialog(this);
-//        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//            File file = fileChooser.getSelectedFile();
-//            ImageIcon icon = new ImageIcon(file.getAbsolutePath());
-//            Image image = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
-//            icon = new ImageIcon(image);
-//
-//            // Set the image in the JLabel
-//            imageLabel.setIcon(icon);
-//        }
-//    }
 
+    /**
+     * Updates the main image.
+     *
+     * @param file the image to show in UI.
+     */
     private void updateImage(File file){
 
         buferedImage = ImageReader.readImage(file.getAbsolutePath());
@@ -296,15 +308,6 @@ public class ClientTab extends JPanel implements Observer , Subject{
         if (tabIndex != -1) {
             tabbedPane.removeTabAt(tabIndex);
         }
-    }
-
-    /**
-     * Performs the action when the "Start" button is clicked.
-     * Implement the desired action here.
-     */
-    private void startButtonActionPerformed() {
-        // Logic for the "Start" button action
-        // Implement what you want to do when the "Start" button is clicked
     }
 
     /**
@@ -360,6 +363,11 @@ public class ClientTab extends JPanel implements Observer , Subject{
 
     }
 
+    /**
+     * Handle the image events.
+     *
+     * @param event the event to handle.
+     */
     private void updateHandleImage(ImageStateEvent event)
     {
         try
@@ -407,6 +415,13 @@ public class ClientTab extends JPanel implements Observer , Subject{
 
     }
 
+    /**
+     * Updates the processed image grid.
+     *
+     * @param row the row to update
+     * @param column the colum to update
+     * @param imageIcon the image to place
+     */
     private void updateHandleImage(int row,int column, ImageIcon imageIcon )
     {
 
@@ -428,11 +443,23 @@ public class ClientTab extends JPanel implements Observer , Subject{
         });
     }
 
+    /**
+     * Updates the processed image grid.
+     *
+     * @param row the row to update
+     * @param column the colum to update
+     * @param splitImage the image to place
+     */
     private void updateHandleImage(int row,int column, SplitImage splitImage )
     {
         this.updateHandleImage(row,column,new ImageIcon( splitImage.getImage().getScaledInstance((int)(splitImage.getImage().getWidth()/w_ratio),(int)(splitImage.getImage().getHeight()/h_ratio) ,Image.SCALE_SMOOTH) ) );
     }
 
+    /**
+     * Handle the errors
+     *
+     * @param event the event to handle
+     */
     private void updateHandleErrors(ErrorEvent event){
         try
         {
