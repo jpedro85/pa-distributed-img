@@ -13,6 +13,7 @@ import Utils.VarSync;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class Server extends Thread implements Subject {
             if ( this.socket != null )
                 this.socket.close();
 
-            this.socket = new ServerSocket (PORT);
+            this.socket = new ServerSocket (PORT, 50, InetAddress.getByName("localhost"));
 
             this.TASK_POOL.start();
 
