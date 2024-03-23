@@ -74,7 +74,6 @@ public class Server extends Thread implements Subject {
             this.startServer();
             super.start();
         }else{
-            System.out.println("merda");
             this.isOpen.unlock();
         }
     }

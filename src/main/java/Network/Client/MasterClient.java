@@ -59,16 +59,18 @@ public class MasterClient extends Thread implements Subject, Observer {
         if ( nRows < 1 || nColumns < 1 )
             throw new IllegalArgumentException("MasterClient nRows and nColumns new to be >= 1");
 
-        this.splitOriginalImage();
-
+        this.originalImage = originalImage;
         this.splittedFinalImage = new BufferedImage[nRows][nColumns];
+
+        this.initializeSplittedOriginalImage(nRows,nColumns);
+
         this.observers = new VarSync< ArrayList<Observer> >( new ArrayList<Observer>() );
         this.setName( name );
         this.slaveClientsList = new ArrayList<SlaveClient>();
         this.isCancel = new VarSync<>(true);
-        this.originalImage = originalImage;
         this.loadTrackerReader = loadTrackerReader;
         this.savePhat = savePhat;
+
     }
 
     /**
@@ -89,8 +91,8 @@ public class MasterClient extends Thread implements Subject, Observer {
         {
             Event event = EventFactory.createErrorEvent( String.format( "Cannot start %s because is waiting for slaves.", this.getName() ), EventTypes.ERROR, SeverityLevels.WARNING );
             this.notify(event);
+            this.isCancel.unlock();
         }
-        this.isCancel.unlock();
     }
 
     /**
@@ -109,8 +111,8 @@ public class MasterClient extends Thread implements Subject, Observer {
      *
      * @throws IllegalArgumentException If the dimensions of the original image are invalid.
      */
-    private void splitOriginalImage() throws IllegalArgumentException{
-        this.splittedOriginalImage = ImageTransformer.splitImage(originalImage,this.getNumberOfRows(),this.getNumberOfColumns() );
+    private void initializeSplittedOriginalImage(int nRows,int nColumns) throws IllegalArgumentException{
+        this.splittedOriginalImage = ImageTransformer.splitImage(originalImage,nRows,nColumns );
     }
 
     /**
@@ -133,7 +135,7 @@ public class MasterClient extends Thread implements Subject, Observer {
             }
         }
 
-        this.notify( EventFactory.createImageStateEvent( "Image divided", EventTypes.IMAGE, ImageStates.PREPARED_FOR_PROCESSING, null));
+        this.notify( EventFactory.createImageStateEvent( "Image divided", EventTypes.IMAGE, ImageStates.PREPARED_FOR_PROCESSING));
 
     }
 
@@ -158,11 +160,11 @@ public class MasterClient extends Thread implements Subject, Observer {
     private void finishTask()
     {
         BufferedImage finalImage = ImageTransformer.joinImages(this.splittedFinalImage,originalImage.getWidth(), originalImage.getHeight(), originalImage.getType() );
-        this.notify( EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.MERGED, null) );
+        this.notify( EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.MERGED) );
 
-        String path = String.format("%s/%s_edited",this.savePhat,this.getName());
+        String path = String.format("%s/%s_edited.png",this.savePhat,this.getName());
         ImageSaver.saveImage(finalImage,"png",path);
-        this.notify( EventFactory.createImageStateEvent( "Image Saved as " + path, EventTypes.IMAGE, ImageStates.SAVED, null) );
+        this.notify( EventFactory.createImageStateEvent( "Image Saved as " + path, EventTypes.IMAGE, ImageStates.SAVED) );
 
     }
 

@@ -127,7 +127,7 @@ class EventFactoryTest {
     void testCreateImageStateEvent_ValidInput() {
         String expectedMessage = "Test ImageState message";
         EventTypes expectedType = EventTypes.IMAGE;
-        ImageStates expectedState = ImageStates.MERGED;
+        ImageStates expectedState = ImageStates.WAITING_FOR_PROCESSING;
         BufferedImage simpleImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
         SplitImage expectedSplit = new SplitImage((short) 2, (short) 2, simpleImage);
 

@@ -114,7 +114,7 @@ public class SlaveClient extends Thread implements Subject {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
             // Send the request to the server
-            Event eventWaitingForServer = EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.WAITING_FOR_PROCESSING, null);
+            Event eventWaitingForServer = EventFactory.createImageStateEvent( "Image Finished", EventTypes.IMAGE, ImageStates.WAITING_FOR_PROCESSING, this.splitImage);
             this.notify(eventWaitingForServer);
             out.writeObject(request);
 

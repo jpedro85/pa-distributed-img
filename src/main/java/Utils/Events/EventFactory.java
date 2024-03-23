@@ -98,13 +98,37 @@ public class EventFactory {
         if (message == null || message.trim().isEmpty()) {
             throw new IllegalArgumentException("Message must not be null or empty.");
         }
-        if (type == null || imageState == null || splitImage == null) {
+        if (type == null || imageState != ImageStates.WAITING_FOR_PROCESSING && imageState != ImageStates.WAITING_FOR_MERGE || splitImage == null) {
             throw new IllegalArgumentException("Event type, imageState and splitImage must not be null.");
         }
         if (type != EventTypes.IMAGE) {
             throw new IllegalArgumentException("The type of event is not valid for this Event.");
         }
         return new ImageStateEvent(message, type, imageState, splitImage);
+    }
+
+    /**
+     * Creates an {@link ImageStateEvent} with the specified message,
+     * event type, image state, and split image object.
+     *
+     * @param message    The message describing the event.
+     * @param type       The type of the event, as defined by {@link EventTypes}.
+     * @param imageState The current state of the image processing task, as defined
+     *                   by {@link ImageStates}.
+     * @return A new instance of {@link ImageStateEvent}.
+     */
+    public static Event createImageStateEvent(String message, EventTypes type, ImageStates imageState) {
+
+        if (message == null || message.trim().isEmpty()) {
+            throw new IllegalArgumentException("Message must not be null or empty.");
+        }
+        if (type == null || imageState == ImageStates.WAITING_FOR_PROCESSING || imageState == ImageStates.WAITING_FOR_MERGE) {
+            throw new IllegalArgumentException("Event type, imageState and splitImage must not be null.");
+        }
+        if (type != EventTypes.IMAGE) {
+            throw new IllegalArgumentException("The type of event is not valid for this Event.");
+        }
+        return new ImageStateEvent(message, type, imageState, null);
     }
 
     /**

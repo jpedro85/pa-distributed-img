@@ -88,7 +88,8 @@ public class ClientsHandler implements Observer {
         {
             if ( masterClient.getName().equals(clientName) )
             {
-                if ( masterClient.isAlive() ) masterClient.cancel();
+                if ( masterClient.isAlive() )
+                    masterClient.cancel();
                 this.clients.asyncGet().remove(masterClient);
                 break;
             }
@@ -104,13 +105,14 @@ public class ClientsHandler implements Observer {
     public void removeClients( String[] clientNames )
     {
         this.clients.lock();
-        for ( MasterClient masterClient  : this.clients.asyncGet())
+        for (String clientName : clientNames )
         {
-            for (String clientName : clientNames )
+            for ( MasterClient masterClient  : this.clients.asyncGet())
             {
                 if ( masterClient.getName().equals(clientName) )
                 {
-                    if ( masterClient.isAlive() ) masterClient.cancel();
+                    if ( masterClient.isAlive() )
+                        masterClient.cancel();
                     this.clients.asyncGet().remove(masterClient);
                     break;
                 }
@@ -240,8 +242,15 @@ public class ClientsHandler implements Observer {
             }
 
         } else {
-             throw new InvalidParameterException("");
+             throw new InvalidParameterException("Invalid Event received");
         }
     }
 
+    /**
+     * @return the number of clients
+     */
+    public int getNumberOfClients()
+    {
+        return this.clients.syncGet().size();
+    }
 }
