@@ -280,7 +280,7 @@ class EventFactoryTest {
     @DisplayName("Create a LoadedImageEvent and validate its properties")
     void testCreateLoadedImageEvent_ValidInput() {
         String message = "Test LoadedImageEvent";
-        EventTypes type = EventTypes.IMAGE;
+        EventTypes type = EventTypes.INTERFACE;
         String name = "Test Image";
         BufferedImage loadedImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 

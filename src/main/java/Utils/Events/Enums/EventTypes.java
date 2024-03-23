@@ -72,5 +72,10 @@ public enum EventTypes {
     /**
      * Indicates that a user initiated an event.
      */
-    INTERFACE
+    INTERFACE,
+    /**
+     * Event launch when updater loadTracker
+     */
+    LOAD_UPDATE
+
 }
