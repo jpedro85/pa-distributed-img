@@ -70,7 +70,7 @@ public class ClientsHandler implements Observer {
 
         // establish event communication
         masterClient.addObserver(tab);
-        tab.addObserver(masterClient);
+    //    tab.addObserver(masterClient);
 
         this.clients.asyncGet().add( masterClient );
         this.clients.unlock();
@@ -228,7 +228,10 @@ public class ClientsHandler implements Observer {
 
                 case START -> this.startClient( ((InterfaceEventWithName)iEvent).getName() );
 
-                case CANCEL -> this.cancelClient( ((InterfaceEventWithName)iEvent).getName() );
+                case CANCEL -> {
+                    this.cancelClient( ((InterfaceEventWithName)iEvent).getName() );
+                    this.removeClient( ((InterfaceEventWithName)iEvent).getName() );
+                }
 
                 case START_ALL -> this.startClients( ((InterfaceEventWithNames)iEvent).getNames() );
 

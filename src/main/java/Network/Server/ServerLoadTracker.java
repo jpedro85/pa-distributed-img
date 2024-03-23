@@ -1,20 +1,29 @@
 package Network.Server;
 
 import java.io.*;
+import java.util.ArrayList;
+
+import Utils.Events.Event;
+import Utils.Events.EventFactory;
+import Utils.Observer.Observer;
+import Utils.Observer.Subject;
 import Utils.VarSync;
 
 /**
  * A singleton class for tracking server load information.
  */
-public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
+public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader, Subject {
     private static ServerLoadTracker instance;
     private static VarSync<File> FILE_VARSYNC;
+
+    private final ArrayList<Observer> OBSERVERS;
 
     /**
      * Private constructor to prevent instantiation from outside the class.
      */
     private ServerLoadTracker() {
         FILE_VARSYNC = new VarSync<>(null);
+        this.OBSERVERS = new ArrayList<>();
     }
 
     /**
@@ -148,6 +157,8 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
         }
 
         FILE_VARSYNC.unlock();
+
+        this.notify(EventFactory.createLoadUpdateEvent("server update", running ,waiting, serverIdentifier) );
     }
 
     /**
@@ -273,5 +284,27 @@ public class ServerLoadTracker implements LoadTrackerEdit, LoadTrackerReader {
         FILE_VARSYNC.unlock();
 
         return port;
+    }
+
+    @Override
+    public void addObserver(Observer observer)
+    {
+        if ( !this.OBSERVERS.contains(observer))
+            this.OBSERVERS.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer)
+    {
+        this.OBSERVERS.remove(observer);
+    }
+
+    @Override
+    public void notify(Event event) {
+
+        for (Observer observer : this.OBSERVERS)
+        {
+            observer.update(this,event);
+        }
     }
 }

@@ -166,6 +166,12 @@ public class MasterClient extends Thread implements Subject, Observer {
         ImageSaver.saveImage(finalImage,"png",path);
         this.notify( EventFactory.createImageStateEvent( "Image Saved as " + path, EventTypes.IMAGE, ImageStates.SAVED) );
 
+        this.isCancel.lock();
+        if ( ! this.isCancel.asyncGet() ) {
+            this.isCancel.asyncSet(true);
+        }
+        this.isCancel.unlock();
+
     }
 
     /**

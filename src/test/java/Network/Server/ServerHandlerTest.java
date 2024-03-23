@@ -27,7 +27,7 @@ public class ServerHandlerTest {
     {
         config = new Config();
         config.setMaxServersNumber(3);
-        config.setStartPort(49165);
+        config.setStartPort(1025);
         config.setServerAmount(2);
         config.setColumns(2);
         config.setRows(2);
@@ -42,6 +42,7 @@ public class ServerHandlerTest {
         ServerLoadTracker.getInstance().setFilePath("load_infoTestHandler.temp");
 
         serversHandler = new ServersHandler(config, loadTrackerEdit);
+        serversHandler.startConfigServer();
         mockObserver = new MockObserver();
         serversHandler.addObserver(mockObserver);
 
