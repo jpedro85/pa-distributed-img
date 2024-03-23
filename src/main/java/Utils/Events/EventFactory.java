@@ -3,6 +3,7 @@ package Utils.Events;
 import Utils.Events.Enums.*;
 import Utils.Events.InterfaceEvents.InterfaceEventWithName;
 import Utils.Events.InterfaceEvents.InterfaceEventWithNames;
+import Utils.Events.InterfaceEvents.LoadUpdateEvent;
 import Utils.Events.InterfaceEvents.LoadedImageEvent;
 import Utils.Image.SplitImage;
 
@@ -176,7 +177,7 @@ public class EventFactory {
         if ( loadedImage == null )
             throw new IllegalArgumentException("loadedImage must not be null.");
 
-        if (type != EventTypes.IMAGE)
+        if (type != EventTypes.INTERFACE)
             throw new IllegalArgumentException("The type of event is not valid for this Event.");
 
         return new LoadedImageEvent(type,message,name,loadedImage);
@@ -236,6 +237,23 @@ public class EventFactory {
             throw new IllegalArgumentException("The type of event is not valid for this Event.");
 
         return new InterfaceEventWithName( eventType, events, message, name );
+    }
+
+    /**
+     * Creates a {@link LoadUpdateEvent} with the specified message, running, waiting, and identifier.
+     *
+     * @param message the message.
+     * @param running the number of running tasks.
+     * @param waiting the number of waiting tasks.
+     * @param identifier the server identifier
+     * @return @return A new instance of {@link LoadUpdateEvent}.
+     */
+    public static Event createLoadUpdateEvent(String message,int running, int waiting, int identifier)
+    {
+        if ( message == null || message.trim().isEmpty() )
+            throw new IllegalArgumentException("Message must not be null or empty.");
+
+        return new LoadUpdateEvent( identifier,  running, waiting, message );
     }
 
 }

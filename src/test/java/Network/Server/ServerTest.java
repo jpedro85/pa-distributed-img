@@ -23,7 +23,7 @@ public class ServerTest {
     @BeforeEach
     public void setUp()
     {
-        server = new Server("TestServer", 49152, 3, loadTraker);
+        server = new Server("TestServer", 1025, 3, loadTraker);
     }
 
     @BeforeAll
@@ -45,9 +45,9 @@ public class ServerTest {
     {
         server.start();
 
-        assertEquals( loadTrakerReader.getServerWithLessLoad(), 49152  );
+        assertEquals( loadTrakerReader.getServerWithLessLoad(), 1025  );
 
-        MockClient client = new MockClient("localhost",49152);
+        MockClient client = new MockClient("localhost",1025);
 
         try {
             client.start();
@@ -68,7 +68,7 @@ public class ServerTest {
 
         assertNotNull(server);
         assertEquals("TestServer", server.getName());
-        assertEquals(49152, server.getPort());
+        assertEquals(1025, server.getPort());
         assertEquals(3, server.getCapacity());
 
     }

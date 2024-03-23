@@ -44,10 +44,13 @@ public class ServersHandler implements Subject, Observer {
         this.LOADTRACKEREDIT = loadTrackerEdit;
         this.nextAvailablePort = new VarSync<>( this.CONFIG.getStartPort() );
 
-        startConfigServer();
+        //startConfigServer();
     }
 
-    private void startConfigServer(){
+    /**
+     * Starts default servers
+     */
+    public void startConfigServer(){
         for (int i = 0; i < this.CONFIG.getServerAmount() ; i++) {
             this.addServer( "Server " + i);
         }
@@ -61,7 +64,8 @@ public class ServersHandler implements Subject, Observer {
     public void addServer(String serverName)
     {
         this.nextAvailablePort.lock();
-        if ( ( this.nextAvailablePort.asyncGet() ) - this.CONFIG.getStartPort() >= 0 )
+       //int numberOfServers = ( this.nextAvailablePort.asyncGet() ) - this.CONFIG.getStartPort();
+        if ( this.SERVERS.size() + 1 <= CONFIG.getMaxServersNumber() )
         {
             Server newServer = new Server( serverName, this.nextAvailablePort.asyncGet(), CONFIG.getTaskPoolSize(), LOADTRACKEREDIT);
             this.SERVERS.add( newServer );
@@ -78,7 +82,7 @@ public class ServersHandler implements Subject, Observer {
 
         this.notify(
                 EventFactory.createErrorEvent( String.format("Cannot add a new server max servers numbers reached. %d ",
-                this.CONFIG.getMaxServersNumber() ),EventTypes.ERROR, SeverityLevels.ERROR )
+                        this.CONFIG.getMaxServersNumber() ),EventTypes.ERROR, SeverityLevels.ERROR )
         );
 
     }

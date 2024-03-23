@@ -1,7 +1,33 @@
 package UI;
+import Network.Client.ClientsHandler;
+import Network.Server.ServerLoadTracker;
+import Network.Server.ServersHandler;
+import Utils.Events.Enums.EventTypes;
+import Utils.Events.Enums.InterfaceEvents;
+import Utils.Events.Enums.ServerStates;
+import Utils.Events.Enums.SeverityLevels;
+import Utils.Events.ErrorEvent;
+import Utils.Events.EventFactory;
+import Utils.Events.InterfaceEvents.LoadUpdateEvent;
+import Utils.Events.ServerEvent;
+import Utils.Image.ImageReader;
+import Utils.Observer.Observer;
+import Utils.Events.Event;
+import Utils.Observer.Subject;
+import Utils.Parser.Config;
+import Utils.VarSync;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.io.File;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+
 
 /**
  * The MainForm class represents the main user interface panel for managing servers and clients.
@@ -10,15 +36,46 @@ import java.awt.*;
  * status. This class provides functionalities for adding/removing servers, starting all servers,
  * browsing in client tabs, and updating the total count of servers.
  */
-public class MainForm extends JPanel {
+public class MainForm extends JPanel implements Observer, Subject {
     private JTabbedPane tabbedPane; // Tabbed pane for managing client tabs
-    private JTextArea serverInfoTextArea; // Text area for displaying server information
+    private JTextPane serversNotfifycations; // Text area for displaying server information
     private JLabel totalServersLabel; // Label for displaying the total count of servers
+
+    private DefaultTableModel tableModel; // table for displaying servers info
+
+    private Observer serversHandler; // instance to observe
+    private Observer clientsHandler; // instance to observe
+
+    // Enum to Uniform the styles
+    private enum StylesTypes {
+        ERROR,
+        WARNING,
+        NORMAL
+    }
+
+    // the config
+    private Config config;
+
+    // to keep track of totalServers in this class
+    private int totalServers = 0;
+
+    // array to keep track of the Clients that have been poped
+    public final VarSync<ArrayList<ClientTab> > poped;
 
     /**
      * Constructs a MainForm object by initializing its components.
+     *
+     * @param serversHandler instance of the serversHandler to send events to
+     * @param clientsHandler instance of the clientsHandler to send events to
+     * @param config the loaded config
      */
-    public MainForm() {
+    public MainForm(ServersHandler serversHandler, ClientsHandler clientsHandler, Config config)
+    {
+        this.serversHandler = serversHandler;
+        this.clientsHandler = clientsHandler;
+        this.config = config;
+        this.poped = new VarSync<>(new ArrayList<>());
+        serversHandler.addObserver(this);
         initComponents();
     }
 
@@ -43,9 +100,6 @@ public class MainForm extends JPanel {
         bottomPanel.add(addTabButton, BorderLayout.LINE_END);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Attach action listener to addTabButton
-        addTabButton.addActionListener(e -> addNewTab());
-
         // Create menu panel with buttons and server info text area
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
@@ -61,28 +115,38 @@ public class MainForm extends JPanel {
         browseButton.setMinimumSize(new Dimension(150, 30));
 
         // Add action listeners to buttons
-        addServerButton.addActionListener(e -> {
-            // Add Server logic here
+        addServerButton.addActionListener( e ->
+        {
+
+            SwingUtilities.invokeLater( () -> {
+                this.notifyAddServer();
+            });
+
         });
 
-        removeServerButton.addActionListener(e -> {
-            // Remove Server logic here
-        });
+        removeServerButton.addActionListener( e -> {  SwingUtilities.invokeLater( () -> { this.notifyRemoveServer(); }); } );
 
-        startAllButton.addActionListener(e -> {
-            // Start All logic here
-        });
+        startAllButton.addActionListener( e -> {  SwingUtilities.invokeLater( () -> { this.notifyStarAll(); });    });
 
-        browseButton.addActionListener(e -> browseActionPerformed());
+        browseButton.addActionListener( e -> {  SwingUtilities.invokeLater( () -> browseActionPerformed()  ); } );
 
         // Create server info text area
-        serverInfoTextArea = new JTextArea(5, 20);
-        serverInfoTextArea.setEditable(false); // Make it read-only
-        JScrollPane scrollPane = new JScrollPane(serverInfoTextArea);
+        serversNotfifycations = new JTextPane();
+        StyleConstants.setForeground(serversNotfifycations.addStyle( StylesTypes.ERROR.toString() ,null),Color.RED);
+        StyleConstants.setForeground(serversNotfifycations.addStyle( StylesTypes.WARNING.toString(),null),new Color(255,128,0));
+        StyleConstants.setForeground(serversNotfifycations.addStyle( StylesTypes.NORMAL.toString(),null), Color.BLACK);
+
+        serversNotfifycations.setEditable(false); // Make it read-only
+        JScrollPane scrollPane = new JScrollPane(serversNotfifycations){
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(300, 300);
+            }
+        };
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         // Create table model and table
-        DefaultTableModel tableModel = new DefaultTableModel(
+        tableModel = new DefaultTableModel(
                 new Object[][]{},
                 new String[]{"Server", "Status", "Waiting", "Running"}
         );
@@ -109,16 +173,8 @@ public class MainForm extends JPanel {
         // Add menu panel to the MainForm at the left
         add(menuPanel, BorderLayout.WEST);
 
-        // Initialize ClientTab
-        addNewTab(); // Add a default tab
     }
 
-    /**
-     * Adds a new client tab to the tabbed pane.
-     */
-    private void addNewTab() {
-        tabbedPane.addTab("New Client", new ClientTab(tabbedPane));
-    }
 
     /**
      * Updates the total count of servers displayed in the label.
@@ -133,14 +189,266 @@ public class MainForm extends JPanel {
      * Performs the action when the "Browse" button is clicked.
      * It retrieves the selected client tab and invokes its browse action.
      */
-    private void browseActionPerformed() {
-        int selectedTabIndex = tabbedPane.getSelectedIndex();
-        if (selectedTabIndex != -1) { // Check if a tab is selected
-            Component selectedComponent = tabbedPane.getComponentAt(selectedTabIndex);
-            if (selectedComponent instanceof ClientTab) {
-                ClientTab clientTab = (ClientTab) selectedComponent;
-                clientTab.browseButtonActionPerformed();
+    private void browseActionPerformed () {
+
+        File fileResult = this.browse();
+        if ( fileResult != null )
+        {
+            this.notifyLoadedImage(fileResult, new ClientTab(tabbedPane,fileResult,this,config.getColumns(),config.getRows()));
+        }
+        else
+        {
+            try
+            {
+                StyledDocument text = serversNotfifycations.getStyledDocument();
+                text.insertString( text.getLength(),"Error:", serversNotfifycations.getStyle(StylesTypes.ERROR.toString()) );
+                text.insertString( text.getLength(),"Invalid image\n", serversNotfifycations.getStyle(StylesTypes.NORMAL.toString()) );
+            }
+            catch (BadLocationException e)
+            {
+                e.printStackTrace();
             }
         }
+
+    }
+
+
+    /**
+     * Opens the file browser
+     *
+     * @return File the open file or null if none where selected or are invalid
+     */
+    private File browse() {
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png");
+        fileChooser.setFileFilter(filter);
+        int returnVal = fileChooser.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }else
+            return null;
+    }
+
+    /**
+     * Notifies clientsHandler that a new image has been loaded and a client tab has been created
+     *
+     * @param file the loaded image
+     * @param tab the client tab to handle that image
+     */
+    private void notifyLoadedImage(File file, ClientTab tab)
+    {
+        ImageReader.readImage(file.getAbsolutePath());
+        Event event = EventFactory.createLoadedImageEvent("New Loaded Image", EventTypes.INTERFACE , file.getName(),  ImageReader.readImage(file.getAbsolutePath()) );
+        this.clientsHandler.update( tab, event);
+    }
+
+    /**
+     * Notifies clientsHandler to start processing all current loaded images
+     */
+    private void notifyStarAll()
+    {
+
+        poped.lock();
+
+        String[] names = new String[tabbedPane.getTabCount() + poped.asyncGet().size() ];
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            names[i] =  tabbedPane.getTitleAt(i);
+
+            ClientTab tab = (ClientTab)((JPanel)tabbedPane.getComponentAt(i));
+            tab.startButton.setEnabled(false);
+            tab.startButton.setVisible(false);
+
+        }
+
+
+        for (int i = 0; i < poped.asyncGet().size(); i++)
+        {
+            ClientTab tab = poped.asyncGet().get(i);
+            names[i] =  tab.getName();
+            tab.startButton.setEnabled(false);
+            tab.startButton.setVisible(false);
+        }
+
+
+        Event event = EventFactory.createInterfaceEventWithNames("New Loaded Image", EventTypes.INTERFACE , InterfaceEvents.START_ALL, names );
+        this.clientsHandler.update( this, event);
+
+        poped.unlock();
+    }
+
+    /**
+     *  Notifies serversHandler to add a server.
+     */
+    private void notifyAddServer()
+    {
+        Event event = EventFactory.createInterfaceEventWithName("Add new server", EventTypes.INTERFACE, InterfaceEvents.ADD_SERVER, "Server");
+        this.serversHandler.update( this, event);
+    }
+
+    /**
+     * Notifies serversHandler to remove a server.
+     */
+    private void notifyRemoveServer()
+    {
+        Event event = EventFactory.createInterfaceEventWithName("Remove last server", EventTypes.INTERFACE, InterfaceEvents.REMOVE_SERVER, "Server");
+        this.serversHandler.update( this, event);
+    }
+
+    /**
+     * Notifies clientsHandler to start the client with the specified name.
+     *
+     * @param name the name of the client
+     */
+    public void startClient(String name)
+    {
+        Event event = EventFactory.createInterfaceEventWithName("start", EventTypes.INTERFACE, InterfaceEvents.START, name);
+        this.clientsHandler.update( this, event);
+    }
+
+    /**
+     * Notifies clientsHandler to cancel the client with the specified name.
+     *
+     * @param name the name of the client
+     */
+    public void cancelClient(String name)
+    {
+        Event event = EventFactory.createInterfaceEventWithName("cancel", EventTypes.INTERFACE, InterfaceEvents.CANCEL, name);
+        this.clientsHandler.update( this, event);
+    }
+
+    @Override
+    public void update(Subject subject, Event event) {
+
+
+        switch (event.getType())
+        {
+            case SERVER -> { updateServerEvents( (ServerEvent) event); }
+
+            case LOAD_UPDATE -> { updateLoadServerEvent( (LoadUpdateEvent) event); }
+
+            case ERROR -> { updateHandleErrors( (ErrorEvent) event); }
+
+            default -> {
+                throw new InvalidParameterException("Main form update only receives. types permitted SERVER and ERROR ");
+            }
+        }
+    }
+
+    /**
+     * Handles the received event
+     *
+     * @param event the event to handle
+     */
+    private void  updateServerEvents(ServerEvent event)
+    {
+        try {
+            StyledDocument text = serversNotfifycations.getStyledDocument();
+
+            switch (event.getServerState()) {
+                case STARTING -> {
+
+                    Object[] row = { event.getServerIdentifier() , "STARTING", 0, 0};
+                    tableModel.addRow( row );
+                    text.insertString( text.getLength(),"Warning:", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+                    text.insertString( text.getLength()," server:" + event.getServerIdentifier() + " is ", serversNotfifycations.getStyle(StylesTypes.NORMAL.toString()) );
+                    text.insertString( text.getLength(),"Starting\n", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+
+                    totalServers++;
+                    totalServersLabel.setText("Total Servers: " + totalServers);
+                }
+
+                case RUNNING -> {
+
+                    tableModel.setValueAt("Running", getIndexOfServer( event.getServerIdentifier() ), 1);
+                    text.insertString( text.getLength(),"Warning:", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+                    text.insertString( text.getLength()," server:" + event.getServerIdentifier() + " is now ", serversNotfifycations.getStyle(StylesTypes.NORMAL.toString()) );
+                    text.insertString( text.getLength(),"Running\n", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+                }
+
+                case CLOSED -> {
+
+                    tableModel.removeRow( getIndexOfServer(event.getServerIdentifier()));
+
+                    text.insertString( text.getLength(),"Warning:", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+                    text.insertString( text.getLength()," server:" + event.getServerIdentifier() + " is now ", serversNotfifycations.getStyle(StylesTypes.NORMAL.toString()) );
+                    text.insertString( text.getLength(),"Closed\n", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+
+                    totalServers--;
+                    totalServersLabel.setText("Total Servers: " + totalServers);
+                }
+
+                case UPDATE -> {
+                    System.out.println("UPDATE " + event.getServerIdentifier());
+                }
+            }
+
+        }catch (BadLocationException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * handles the update od server states.
+     *
+     * @param event the event to handle.
+     */
+    private void updateLoadServerEvent(LoadUpdateEvent event)
+    {
+        int row = getIndexOfServer( event.getID() );
+        tableModel.setValueAt( event.getWAITING() , row, 2);
+        tableModel.setValueAt( event.getRUNNING() , row, 3);
+    }
+
+    /**
+     * @param id the id of the server
+     * @return the row index corresponding with
+     */
+    private int getIndexOfServer(int id) {
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            int currentId = (int) tableModel.getValueAt(i, 0) ;
+            if (currentId == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Handles the error events
+     * @param event the event to handle
+     */
+    private void updateHandleErrors(ErrorEvent event){
+        try
+        {
+            StyledDocument text = serversNotfifycations.getStyledDocument();
+
+            if( event.getSeverityLevel() == SeverityLevels.ERROR)
+                text.insertString( text.getLength(),"Error:", serversNotfifycations.getStyle(StylesTypes.ERROR.toString()) );
+            else
+                text.insertString( text.getLength(),"Warning:", serversNotfifycations.getStyle(StylesTypes.WARNING.toString()) );
+
+            text.insertString( text.getLength(),event.getMessage() + "\n", serversNotfifycations.getStyle(StylesTypes.NORMAL.toString()) );
+
+        }
+        catch (BadLocationException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void addObserver(Observer observer) {
+
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+
+    }
+
+    @Override
+    public void notify(Event event) {
+
     }
 }
