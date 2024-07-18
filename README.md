@@ -68,9 +68,9 @@ The `pa-distributed-img` project is designed to demonstrate advanced programming
 ### Running the Application
 
 1. **Start the App:**
-```sh
-mvn exec:java
-```
+   ```sh
+   mvn exec:java
+   ```
 
 ### User Interface
 
