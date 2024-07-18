@@ -63,8 +63,7 @@ The `pa-distributed-img` project is designed to demonstrate advanced programming
    ```
 
 3. **Configure the Project:**
-   - Edit the `project.config` file to specify the number of servers and their processing capacities.
-   - Ensure the `load.info` file is correctly set up for load management.
+   - Edit the `config.ini` file to specify the number of servers and their processing capacities along with the starting port for sockets and the maximum amount of servers the user choose
 
 ### Running the Application
 
