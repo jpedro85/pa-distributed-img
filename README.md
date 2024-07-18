@@ -67,17 +67,10 @@ The `pa-distributed-img` project is designed to demonstrate advanced programming
 
 ### Running the Application
 
-1. **Start the Servers:**
-
-   ```sh
-   java -jar server.jar
-   ```
-
-2. **Start the Client:**
-
-   ```sh
-   java -jar client.jar
-   ```
+1. **Start the App:**
+```sh
+mvn exec:java
+```
 
 ### User Interface
 
